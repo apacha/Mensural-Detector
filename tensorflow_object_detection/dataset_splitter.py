@@ -36,8 +36,8 @@ class DatasetSplitter:
 
     def get_random_training_validation_and_test_sample_indices(self,
                                                                dataset_size: int,
-                                                               validation_percentage: float = 0.1,
-                                                               test_percentage: float = 0.1,
+                                                               validation_percentage: float = 0.2,
+                                                               test_percentage: float = 0.0,
                                                                seed: int = 0) -> (List[int], List[int], List[int]):
         """
         Returns a reproducible set of random sample indices from the entire dataset population

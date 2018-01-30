@@ -16,7 +16,7 @@ python generate_mapping.py
 python annotation_generator.py
 python dataset_splitter.py
 
-python create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=training 		--annotations_dir=annotations 	--output_path=..\training_with_stafflines_all_classes.record 			--label_map_path=mapping.txt
-python create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=validation 	--annotations_dir=annotations 	--output_path=..\validation_with_stafflines_all_classes.record 		--label_map_path=mapping.txt
-python create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=test 			--annotations_dir=annotations 	--output_path=..\test_with_stafflines_all_classes.record 				--label_map_path=mapping.txt
+python create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=training 		--annotations_dir=annotations 	--output_path=..\training.record 			--label_map_path=mapping.txt
+python create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=validation 	--annotations_dir=annotations 	--output_path=..\validation.record 		--label_map_path=mapping.txt
+python create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=test 			--annotations_dir=annotations 	--output_path=..\test.record 				--label_map_path=mapping.txt
 Stop-Transcript
