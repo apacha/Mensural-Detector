@@ -14,8 +14,8 @@ if __name__ == "__main__":
 
     dataset_directory = args.dataset_directory
     files = os.listdir(dataset_directory)
-    images = [file for file in files if file.endswith(".JPG")]
-    annotations = [file for file in files if file.endswith(".txt")]
+    images = sorted([file for file in files if file.endswith(".JPG")])
+    annotations = sorted([file for file in files if file.endswith(".txt")])
     pairs = zip(images, annotations)
 
     output_directory = "output"
