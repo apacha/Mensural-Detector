@@ -1,0 +1,160 @@
+
+item{
+  id: 1
+  name: 'barline'
+}
+
+item{
+  id: 2
+  name: 'beam'
+}
+
+item{
+  id: 3
+  name: 'brevis'
+}
+
+item{
+  id: 4
+  name: 'brevis_rest'
+}
+
+item{
+  id: 5
+  name: 'c_clef'
+}
+
+item{
+  id: 6
+  name: 'coloured_brevis'
+}
+
+item{
+  id: 7
+  name: 'coloured_minima'
+}
+
+item{
+  id: 8
+  name: 'coloured_semibrevis'
+}
+
+item{
+  id: 9
+  name: 'coloured_semiminima'
+}
+
+item{
+  id: 10
+  name: 'common_time'
+}
+
+item{
+  id: 11
+  name: 'custos'
+}
+
+item{
+  id: 12
+  name: 'cut_time'
+}
+
+item{
+  id: 13
+  name: 'dot'
+}
+
+item{
+  id: 14
+  name: 'double_barline'
+}
+
+item{
+  id: 15
+  name: 'f_clef_1'
+}
+
+item{
+  id: 16
+  name: 'f_clef_2'
+}
+
+item{
+  id: 17
+  name: 'fermata'
+}
+
+item{
+  id: 18
+  name: 'flat'
+}
+
+item{
+  id: 19
+  name: 'g_clef'
+}
+
+item{
+  id: 20
+  name: 'ligature'
+}
+
+item{
+  id: 21
+  name: 'longa'
+}
+
+item{
+  id: 22
+  name: 'longa_rest'
+}
+
+item{
+  id: 23
+  name: 'minima'
+}
+
+item{
+  id: 24
+  name: 'minima_rest'
+}
+
+item{
+  id: 25
+  name: 'proportio_maior'
+}
+
+item{
+  id: 26
+  name: 'proportio_minor'
+}
+
+item{
+  id: 27
+  name: 'semibrevis'
+}
+
+item{
+  id: 28
+  name: 'semibrevis_rest'
+}
+
+item{
+  id: 29
+  name: 'semiminima'
+}
+
+item{
+  id: 30
+  name: 'semiminima_rest'
+}
+
+item{
+  id: 31
+  name: 'sharp'
+}
+
+item{
+  id: 32
+  name: 'undefined'
+}

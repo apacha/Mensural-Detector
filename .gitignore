@@ -3,3 +3,5 @@
 .idea
 output
 annotations
+/training_validation_test/
+*.record
