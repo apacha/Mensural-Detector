@@ -207,7 +207,7 @@ def train(create_tensor_dict_fn, create_model_fn, train_config, master, task,
 
     # Place the global step on the device storing the variables.
     with tf.device(deploy_config.variables_device()):
-      global_step = slim.create_global_step()
+      global_step = tf.train.create_global_step()
 
     with tf.device(deploy_config.inputs_device()):
       input_queue = create_input_queue(
