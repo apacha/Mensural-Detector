@@ -67,7 +67,7 @@ def compute_precision_recall(scores, labels, num_gt):
     return precision, recall
 
 
-def compute_average_precision_and_recall(precision, recall):
+def compute_average_precision(precision, recall):
     """Compute Average Precision according to the definition in VOCdevkit.
 
     Precision is modified to ensure that it does not decrease as recall
