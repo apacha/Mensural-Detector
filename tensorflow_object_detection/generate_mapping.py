@@ -5,8 +5,8 @@ import argparse
 from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
-parser.add_argument("dataset_dir", default="../db")
-parser.add_argument("mapping_filepath", default="mapping.txt")
+parser.add_argument("-d", "--dataset_dir", default="../db", type=str)
+parser.add_argument("-m", "--mapping_filepath", default="mapping.txt", type=str)
 args = parser.parse_args()
 
 dataset_directory = args.dataset_dir
