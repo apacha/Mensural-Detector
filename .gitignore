@@ -8,3 +8,6 @@ annotations
 Transcripts
 data
 /classification/
+/build/
+/dist/
+/tensorflow_object_detection.egg-info/
