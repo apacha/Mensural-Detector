@@ -7,10 +7,10 @@ from setuptools import setup
 REQUIRED_PACKAGES = ['Pillow>=1.0']
 
 setup(
-    name='tensorflow_object_detection',
+    name='object_detection',
     version='0.1',
     install_requires=REQUIRED_PACKAGES,
     include_package_data=True,
-    packages=[p for p in find_packages() if p.startswith('tensorflow_object_detection')],
+    packages=[p for p in find_packages() if p.startswith('object_detection')],
     description='Tensorflow Object Detection Library for Mensural Detection',
 )
