@@ -61,7 +61,7 @@ def visualize_detection_results(result_dict,
                                 agnostic_mode=False,
                                 show_groundtruth=False,
                                 min_score_thresh=.5,
-                                max_num_predictions=20):
+                                max_num_predictions=600):
   """Visualizes detection results and writes visualizations to image summaries.
 
   This function visualizes an image with its detected bounding boxes and writes
