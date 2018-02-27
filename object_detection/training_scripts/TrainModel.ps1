@@ -15,8 +15,9 @@ $env:PYTHONPATH = "$($pathToGitRoot);$($pathToSourceRoot);$($pathToGitRoot)/slim
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_pretrained"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_1200_proposals"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_1200_proposals_max_suppr_09"
-$configuration = "faster_rcnn_inception_resnet_v2_atrous_1200_proposals_max_suppr_03"
-#$configuration = "faster_rcnn_inception_resnet_v2_atrous_1200_proposals_only_rpn"
+# $configuration = "faster_rcnn_inception_resnet_v2_atrous_1200_proposals_max_suppr_03"
+# $configuration = "faster_rcnn_inception_resnet_v2_atrous_1200_proposals_only_rpn"
+$configuration = "ssd_inception_v2_focal_loss"
 
 
 Start-Transcript -path "$($pathToTranscript)/TrainModel-$($configuration).txt" -append
