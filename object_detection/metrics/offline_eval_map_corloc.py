@@ -22,7 +22,7 @@ The evaluation metrics set is supplied in object_detection.protos.EvalConfig
 in metrics_set field.
 Currently two set of metrics are supported:
 - pascal_voc_metrics: standard PASCAL VOC 2007 metric
-- open_images_metrics: Open Image V2 metric
+- open_images_detection_metrics: Open Image V2 metric
 All other field of object_detection.protos.EvalConfig are ignored.
 
 Example usage:
@@ -75,16 +75,16 @@ def _generate_filenames(filenames):
 
 def read_data_and_evaluate(input_config, eval_config):
     """Reads pre-computed object detections and groundtruth from tf_record.
-  
+
     Args:
       input_config: input config proto of type
         object_detection.protos.InputReader.
       eval_config: evaluation config proto of type
         object_detection.protos.EvalConfig.
-  
+
     Returns:
       Evaluated detections metrics.
-  
+
     Raises:
       ValueError: if input_reader type is not supported or metric type is unknown.
     """
@@ -136,7 +136,7 @@ def read_data_and_evaluate(input_config, eval_config):
 
 def write_metrics(metrics, output_dir):
     """Write metrics to the output directory.
-  
+
     Args:
       metrics: A dictionary containing metric names and values.
       output_dir: Directory to write metrics to.

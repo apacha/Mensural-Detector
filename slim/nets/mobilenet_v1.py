@@ -147,9 +147,9 @@ def mobilenet_v1_base(inputs,
                       output_stride=None,
                       scope=None):
     """Mobilenet v1.
-
+  
     Constructs a Mobilenet v1 network from inputs to the given final endpoint.
-
+  
     Args:
       inputs: a tensor of shape [batch_size, height, width, channels].
       final_endpoint: specifies the endpoint to construct the network up to. It
@@ -172,12 +172,12 @@ def mobilenet_v1_base(inputs,
         of the activation maps. Allowed values are 8 (accurate fully convolutional
         mode), 16 (fast fully convolutional mode), 32 (classification mode).
       scope: Optional variable_scope.
-
+  
     Returns:
       tensor_out: output tensor corresponding to the final_endpoint.
       end_points: a set of activations for external use, for example summaries or
                   losses.
-
+  
     Raises:
       ValueError: if final_endpoint is not set to one of the predefined values,
                   or depth_multiplier <= 0, or the target output_stride is not
@@ -279,7 +279,7 @@ def mobilenet_v1(inputs,
                  scope='MobilenetV1',
                  global_pool=False):
     """Mobilenet v1 model for classification.
-
+  
     Args:
       inputs: a tensor of shape [batch_size, height, width, channels].
       num_classes: number of predicted classes. If 0 or None, the logits layer
@@ -305,14 +305,14 @@ def mobilenet_v1(inputs,
         logits layer. If false or unset, pooling is done with a fixed window
         that reduces default-sized inputs to 1x1, while larger inputs lead to
         larger outputs. If true, any input size is pooled down to 1x1.
-
+  
     Returns:
       net: a 2D Tensor with the logits (pre-softmax activations) if num_classes
         is a non-zero integer, or the non-dropped-out input to the logits layer
         if num_classes is 0 or None.
       end_points: a dictionary from components of the network to the corresponding
         activation.
-
+  
     Raises:
       ValueError: Input rank is invalid.
     """
@@ -369,14 +369,14 @@ mobilenet_v1_025 = wrapped_partial(mobilenet_v1, depth_multiplier=0.25)
 
 def _reduced_kernel_size_for_small_input(input_tensor, kernel_size):
     """Define kernel size which is automatically reduced for small input.
-
+  
     If the shape of the input images is unknown at graph construction time this
     function assumes that the input images are large enough.
-
+  
     Args:
       input_tensor: input tensor of size [batch_size, height, width, channels].
       kernel_size: desired kernel size of length 2: [kernel_height, kernel_width]
-
+  
     Returns:
       a tensor with the kernel size.
     """
@@ -394,13 +394,13 @@ def mobilenet_v1_arg_scope(is_training=True,
                            stddev=0.09,
                            regularize_depthwise=False):
     """Defines the default MobilenetV1 arg scope.
-
+  
     Args:
       is_training: Whether or not we're training the model.
       weight_decay: The weight decay to use for regularizing the model.
       stddev: The standard deviation of the trunctated normal weight initializer.
       regularize_depthwise: Whether or not apply regularization on depthwise.
-
+  
     Returns:
       An `arg_scope` to use for the mobilenet v1 model.
     """

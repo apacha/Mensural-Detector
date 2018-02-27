@@ -19,6 +19,7 @@ from __future__ import print_function
 
 from math import log
 
+from six.moves import xrange
 import tensorflow as tf
 
 slim = tf.contrib.slim
@@ -44,9 +45,9 @@ def discriminator(inputs,
                   scope='Discriminator',
                   fused_batch_norm=False):
     """Discriminator network for DCGAN.
-  
+
     Construct discriminator network from inputs to the final endpoint.
-  
+
     Args:
       inputs: A tensor of size [batch_size, height, width, channels]. Must be
         floating point.
@@ -57,11 +58,11 @@ def discriminator(inputs,
       scope: Optional variable_scope.
       fused_batch_norm: If `True`, use a faster, fused implementation of
         batch norm.
-  
+
     Returns:
       logits: The pre-softmax activations, a tensor of size [batch_size, 1]
       end_points: a dictionary from components of the network to their activation.
-  
+
     Raises:
       ValueError: If the input image shape is not 4-dimensional, if the spatial
         dimensions aren't defined at graph construction time, if the spatial
@@ -114,9 +115,9 @@ def generator(inputs,
               scope='Generator',
               fused_batch_norm=False):
     """Generator network for DCGAN.
-  
+
     Construct generator network from inputs to the final endpoint.
-  
+
     Args:
       inputs: A tensor with any size N. [batch_size, N]
       depth: Number of channels in last deconvolution layer.
@@ -129,12 +130,12 @@ def generator(inputs,
       scope: Optional variable_scope.
       fused_batch_norm: If `True`, use a faster, fused implementation of
         batch norm.
-  
+
     Returns:
       logits: the pre-softmax activations, a tensor of size
         [batch_size, 32, 32, channels]
       end_points: a dictionary from components of the network to their activation.
-  
+
     Raises:
       ValueError: If `inputs` is not 2-dimensional.
       ValueError: If `final_size` isn't a power of 2 or is less than 8.

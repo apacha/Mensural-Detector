@@ -27,13 +27,13 @@ from object_detection.utils import dataset_util
 def tf_example_from_annotations_data_frame(annotations_data_frame, label_map,
                                            encoded_image):
     """Populates a TF Example message with image annotations from a data frame.
-  
+
     Args:
       annotations_data_frame: Data frame containing the annotations for a single
         image.
       label_map: String to integer label map.
       encoded_image: The encoded image string
-  
+
     Returns:
       The populated TF Example, if the label of at least one object is present in
       label_map. Otherwise, returns None.
@@ -90,19 +90,19 @@ def tf_example_from_annotations_data_frame(annotations_data_frame, label_map,
 
 def open_sharded_output_tfrecords(exit_stack, base_path, num_shards):
     """Opens all TFRecord shards for writing and adds them to an exit stack.
-  
+
     Args:
       exit_stack: A context2.ExitStack used to automatically closed the TFRecords
         opened in this function.
       base_path: The base path for all shards
       num_shards: The number of shards
-  
+
     Returns:
       The list of opened TFRecords. Position k in the list corresponds to shard k.
     """
     tf_record_output_filenames = [
         '{}-{:05d}-of-{:05d}'.format(base_path, idx, num_shards)
-        for idx in xrange(num_shards)
+        for idx in range(num_shards)
     ]
 
     tfrecords = [

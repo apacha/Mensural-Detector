@@ -35,7 +35,7 @@ def inception_arg_scope(weight_decay=0.00004,
                         batch_norm_epsilon=0.001,
                         activation_fn=tf.nn.relu):
     """Defines the default arg scope for inception models.
-
+  
     Args:
       weight_decay: The weight decay to use for regularizing the model.
       use_batch_norm: "If `True`, batch_norm is applied after each convolution.
@@ -43,7 +43,7 @@ def inception_arg_scope(weight_decay=0.00004,
       batch_norm_epsilon: Small float added to variance to avoid dividing by zero
         in batch norm.
       activation_fn: Activation function for conv2d.
-
+  
     Returns:
       An `arg_scope` to use for the inception models.
     """

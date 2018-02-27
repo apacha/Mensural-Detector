@@ -48,10 +48,10 @@ slim = tf.contrib.slim
 
 def vgg_arg_scope(weight_decay=0.0005):
     """Defines the VGG arg scope.
-
+  
     Args:
       weight_decay: The l2 regularization coefficient.
-
+  
     Returns:
       An arg_scope.
     """
@@ -72,10 +72,10 @@ def vgg_a(inputs,
           fc_conv_padding='VALID',
           global_pool=False):
     """Oxford Net VGG 11-Layers version A Example.
-
+  
     Note: All the fully_connected layers have been transformed to conv2d layers.
           To use in classification mode, resize input to 224x224.
-
+  
     Args:
       inputs: a tensor of size [batch_size, height, width, channels].
       num_classes: number of predicted classes. If 0 or None, the logits layer is
@@ -95,7 +95,7 @@ def vgg_a(inputs,
       global_pool: Optional boolean flag. If True, the input to the classification
         layer is avgpooled to size 1x1, for any input size. (This is not part
         of the original VGG architecture.)
-
+  
     Returns:
       net: the output of the logits layer (if num_classes is a non-zero integer),
         or the input to the logits layer (if num_classes is 0 or None).
@@ -152,10 +152,10 @@ def vgg_16(inputs,
            fc_conv_padding='VALID',
            global_pool=False):
     """Oxford Net VGG 16-Layers version D Example.
-
+  
     Note: All the fully_connected layers have been transformed to conv2d layers.
           To use in classification mode, resize input to 224x224.
-
+  
     Args:
       inputs: a tensor of size [batch_size, height, width, channels].
       num_classes: number of predicted classes. If 0 or None, the logits layer is
@@ -175,7 +175,7 @@ def vgg_16(inputs,
       global_pool: Optional boolean flag. If True, the input to the classification
         layer is avgpooled to size 1x1, for any input size. (This is not part
         of the original VGG architecture.)
-
+  
     Returns:
       net: the output of the logits layer (if num_classes is a non-zero integer),
         or the input to the logits layer (if num_classes is 0 or None).
@@ -232,10 +232,10 @@ def vgg_19(inputs,
            fc_conv_padding='VALID',
            global_pool=False):
     """Oxford Net VGG 19-Layers version E Example.
-
+  
     Note: All the fully_connected layers have been transformed to conv2d layers.
           To use in classification mode, resize input to 224x224.
-
+  
     Args:
       inputs: a tensor of size [batch_size, height, width, channels].
       num_classes: number of predicted classes. If 0 or None, the logits layer is
@@ -255,7 +255,7 @@ def vgg_19(inputs,
       global_pool: Optional boolean flag. If True, the input to the classification
         layer is avgpooled to size 1x1, for any input size. (This is not part
         of the original VGG architecture.)
-
+  
     Returns:
       net: the output of the logits layer (if num_classes is a non-zero integer),
         or the non-dropped-out input to the logits layer (if num_classes is 0 or

@@ -118,10 +118,10 @@ class TfExampleDetectionAndGTParser(data_parser.DataToNumpyParser):
 
     def parse(self, tf_example):
         """Parses tensorflow example and returns a tensor dictionary.
-    
+
         Args:
           tf_example: a tf.Example object.
-    
+
         Returns:
           A dictionary of the following numpy arrays:
           fields.DetectionResultFields.source_id - string containing original image

@@ -24,11 +24,11 @@ import tensorflow as tf
 from object_detection.dataset_tools import create_pascal_tf_record
 
 
-class DictToTFExampleTest(tf.test.TestCase):
+class CreatePascalTFRecordTest(tf.test.TestCase):
 
     def _assertProtoEqual(self, proto_field, expectation):
         """Helper function to assert if a proto field equals some value.
-    
+
         Args:
           proto_field: The protobuf field to compare.
           expectation: The expected value of the protobuf field.

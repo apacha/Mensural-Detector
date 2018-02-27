@@ -60,19 +60,19 @@ def alexnet_v2(inputs,
                scope='alexnet_v2',
                global_pool=False):
     """AlexNet version 2.
-  
+
     Described in: http://arxiv.org/pdf/1404.5997v2.pdf
     Parameters from:
     github.com/akrizhevsky/cuda-convnet2/blob/master/layers/
     layers-imagenet-1gpu.cfg
-  
+
     Note: All the fully_connected layers have been transformed to conv2d layers.
           To use in classification mode, resize input to 224x224 or set
           global_pool=True. To use in fully convolutional mode, set
           spatial_squeeze to false.
           The LRN layers have been removed and change the initializers from
           random_normal_initializer to xavier_initializer.
-  
+
     Args:
       inputs: a tensor of size [batch_size, height, width, channels].
       num_classes: the number of predicted classes. If 0 or None, the logits layer
@@ -86,7 +86,7 @@ def alexnet_v2(inputs,
       global_pool: Optional boolean flag. If True, the input to the classification
         layer is avgpooled to size 1x1, for any input size. (This is not part
         of the original AlexNet.)
-  
+
     Returns:
       net: the output of the logits layer (if num_classes is a non-zero integer),
         or the non-dropped-out input to the logits layer (if num_classes is 0

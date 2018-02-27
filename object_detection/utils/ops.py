@@ -23,15 +23,16 @@ import tensorflow as tf
 from object_detection.core import box_list
 from object_detection.core import box_list_ops
 from object_detection.core import standard_fields as fields
+from object_detection.utils import shape_utils
 from object_detection.utils import static_shape
 
 
 def expanded_shape(orig_shape, start_dim, num_dims):
     """Inserts multiple ones into a shape vector.
-  
+
     Inserts an all-1 vector of length num_dims at position start_dim into a shape.
     Can be combined with tf.reshape to generalize tf.expand_dims.
-  
+
     Args:
       orig_shape: the shape into which the all-1 vector is added (int32 vector)
       start_dim: insertion position (int scalar)
@@ -51,13 +52,13 @@ def expanded_shape(orig_shape, start_dim, num_dims):
 def normalized_to_image_coordinates(normalized_boxes, image_shape,
                                     parallel_iterations=32):
     """Converts a batch of boxes from normal to image coordinates.
-  
+
     Args:
       normalized_boxes: a float32 tensor of shape [None, num_boxes, 4] in
         normalized coordinates.
       image_shape: a float32 tensor of shape [4] containing the image shape.
       parallel_iterations: parallelism for the map_fn op.
-  
+
     Returns:
       absolute_boxes: a float32 tensor of shape [None, num_boxes, 4] containg the
         boxes in image coordinates.
@@ -68,7 +69,7 @@ def normalized_to_image_coordinates(normalized_boxes, image_shape,
             box_list.BoxList(normalized_boxes),
             image_shape[1], image_shape[2], check_range=False).get()
 
-    absolute_boxes = tf.map_fn(
+    absolute_boxes = shape_utils.static_or_dynamic_map_fn(
         _to_absolute_coordinates,
         elems=(normalized_boxes),
         dtype=tf.float32,
@@ -79,20 +80,20 @@ def normalized_to_image_coordinates(normalized_boxes, image_shape,
 
 def meshgrid(x, y):
     """Tiles the contents of x and y into a pair of grids.
-  
+
     Multidimensional analog of numpy.meshgrid, giving the same behavior if x and y
     are vectors. Generally, this will give:
-  
+
     xgrid(i1, ..., i_m, j_1, ..., j_n) = x(j_1, ..., j_n)
     ygrid(i1, ..., i_m, j_1, ..., j_n) = y(i_1, ..., i_m)
-  
+
     Keep in mind that the order of the arguments and outputs is reverse relative
     to the order of the indices they go into, done for compatibility with numpy.
     The output tensors have the same shapes.  Specifically:
-  
+
     xgrid.get_shape() = y.get_shape().concatenate(x.get_shape())
     ygrid.get_shape() = y.get_shape().concatenate(x.get_shape())
-  
+
     Args:
       x: A tensor of arbitrary shape and rank. xgrid will contain these values
          varying in its last dimensions.
@@ -116,20 +117,42 @@ def meshgrid(x, y):
         return xgrid, ygrid
 
 
+def fixed_padding(inputs, kernel_size, rate=1):
+    """Pads the input along the spatial dimensions independently of input size.
+
+    Args:
+      inputs: A tensor of size [batch, height_in, width_in, channels].
+      kernel_size: The kernel to be used in the conv2d or max_pool2d operation.
+                   Should be a positive integer.
+      rate: An integer, rate for atrous convolution.
+
+    Returns:
+      output: A tensor of size [batch, height_out, width_out, channels] with the
+        input, either intact (if kernel_size == 1) or padded (if kernel_size > 1).
+    """
+    kernel_size_effective = kernel_size + (kernel_size - 1) * (rate - 1)
+    pad_total = kernel_size_effective - 1
+    pad_beg = pad_total // 2
+    pad_end = pad_total - pad_beg
+    padded_inputs = tf.pad(inputs, [[0, 0], [pad_beg, pad_end],
+                                    [pad_beg, pad_end], [0, 0]])
+    return padded_inputs
+
+
 def pad_to_multiple(tensor, multiple):
     """Returns the tensor zero padded to the specified multiple.
-  
+
     Appends 0s to the end of the first and second dimension (height and width) of
     the tensor until both dimensions are a multiple of the input argument
     'multiple'. E.g. given an input tensor of shape [1, 3, 5, 1] and an input
     multiple of 4, PadToMultiple will append 0s so that the resulting tensor will
     be of shape [1, 4, 8, 1].
-  
+
     Args:
       tensor: rank 4 float32 tensor, where
               tensor -> [batch_size, height, width, channels].
       multiple: the multiple to pad to.
-  
+
     Returns:
       padded_tensor: the tensor zero padded to the specified multiple.
     """
@@ -182,36 +205,38 @@ def pad_to_multiple(tensor, multiple):
 
 def padded_one_hot_encoding(indices, depth, left_pad):
     """Returns a zero padded one-hot tensor.
-  
+
     This function converts a sparse representation of indices (e.g., [4]) to a
     zero padded one-hot representation (e.g., [0, 0, 0, 0, 1] with depth = 4 and
     left_pad = 1). If `indices` is empty, the result will simply be a tensor of
     shape (0, depth + left_pad). If depth = 0, then this function just returns
     `None`.
-  
+
     Args:
       indices: an integer tensor of shape [num_indices].
       depth: depth for the one-hot tensor (integer).
       left_pad: number of zeros to left pad the one-hot tensor with (integer).
-  
+
     Returns:
       padded_onehot: a tensor with shape (num_indices, depth + left_pad). Returns
         `None` if the depth is zero.
-  
+
     Raises:
       ValueError: if `indices` does not have rank 1 or if `left_pad` or `depth are
         either negative or non-integers.
-  
+
     TODO: add runtime checks for depth and indices.
     """
-    if depth < 0 or not isinstance(depth, (int, long) if six.PY2 else int):
+    if depth < 0 or not isinstance(depth, six.integer_types):
         raise ValueError('`depth` must be a non-negative integer.')
-    if left_pad < 0 or not isinstance(left_pad, (int, long) if six.PY2 else int):
+    if left_pad < 0 or not isinstance(left_pad, six.integer_types):
         raise ValueError('`left_pad` must be a non-negative integer.')
     if depth == 0:
         return None
-    if len(indices.get_shape().as_list()) != 1:
-        raise ValueError('`indices` must have rank 1')
+
+    rank = len(indices.get_shape().as_list())
+    if rank != 1:
+        raise ValueError('`indices` must have rank 1, but has rank=%s' % rank)
 
     def one_hot_and_pad():
         one_hot = tf.cast(tf.one_hot(tf.cast(indices, tf.int64), depth,
@@ -225,7 +250,7 @@ def padded_one_hot_encoding(indices, depth, left_pad):
 
 def dense_to_sparse_boxes(dense_locations, dense_num_boxes, num_classes):
     """Converts bounding boxes from dense to sparse form.
-  
+
     Args:
       dense_locations:  a [max_num_boxes, 4] tensor in which only the first k rows
         are valid bounding box location coordinates, where k is the sum of
@@ -236,7 +261,7 @@ def dense_to_sparse_boxes(dense_locations, dense_num_boxes, num_classes):
          of class 3. The sum of elements in this tensor is the number of valid
          bounding boxes.
       num_classes: number of classes
-  
+
     Returns:
       box_locations: a [num_boxes, 4] tensor containing only valid bounding
          boxes (i.e. the first num_boxes rows of dense_locations)
@@ -260,12 +285,12 @@ def indices_to_dense_vector(indices,
                             default_value=0,
                             dtype=tf.float32):
     """Creates dense vector with indices set to specific value and rest to zeros.
-  
+
     This function exists because it is unclear if it is safe to use
       tf.sparse_to_dense(indices, [size], 1, validate_indices=False)
     with indices which are not ordered.
     This function accepts a dynamic size (e.g. tf.shape(tensor)[0])
-  
+
     Args:
       indices: 1d Tensor with integer indices which are to be set to
           indices_values.
@@ -273,7 +298,7 @@ def indices_to_dense_vector(indices,
       indices_value: values of elements specified by indices in the output vector
       default_value: values of other elements in the output vector.
       dtype: data type.
-  
+
     Returns:
       dense 1D Tensor of shape [size] with indices set to indices_values and the
           rest set to default_value.
@@ -286,9 +311,14 @@ def indices_to_dense_vector(indices,
                              [zeros, values])
 
 
+def reduce_sum_trailing_dimensions(tensor, ndims):
+    """Computes sum across all dimensions following first `ndims` dimensions."""
+    return tf.reduce_sum(tensor, axis=tuple(range(ndims, tensor.shape.ndims)))
+
+
 def retain_groundtruth(tensor_dict, valid_indices):
     """Retains groundtruth by valid indices.
-  
+
     Args:
       tensor_dict: a dictionary of following groundtruth tensors -
         fields.InputDataFields.groundtruth_boxes
@@ -299,10 +329,10 @@ def retain_groundtruth(tensor_dict, valid_indices):
         fields.InputDataFields.groundtruth_label_types
         fields.InputDataFields.groundtruth_difficult
       valid_indices: a tensor with valid indices for the box-level groundtruth.
-  
+
     Returns:
       a dictionary of tensors containing only the groundtruth for valid_indices.
-  
+
     Raises:
       ValueError: If the shape of valid_indices is invalid.
       ValueError: field fields.InputDataFields.groundtruth_boxes is
@@ -343,7 +373,7 @@ def retain_groundtruth(tensor_dict, valid_indices):
 
 def retain_groundtruth_with_positive_classes(tensor_dict):
     """Retains only groundtruth with positive class ids.
-  
+
     Args:
       tensor_dict: a dictionary of following groundtruth tensors -
         fields.InputDataFields.groundtruth_boxes
@@ -352,11 +382,11 @@ def retain_groundtruth_with_positive_classes(tensor_dict):
         fields.InputDataFields.groundtruth_area
         fields.InputDataFields.groundtruth_label_types
         fields.InputDataFields.groundtruth_difficult
-  
+
     Returns:
       a dictionary of tensors containing only the groundtruth with positive
       classes.
-  
+
     Raises:
       ValueError: If groundtruth_classes tensor is not in tensor_dict.
     """
@@ -369,10 +399,10 @@ def retain_groundtruth_with_positive_classes(tensor_dict):
 
 def replace_nan_groundtruth_label_scores_with_ones(label_scores):
     """Replaces nan label scores with 1.0.
-  
+
     Args:
       label_scores: a tensor containing object annoation label scores.
-  
+
     Returns:
       a tensor where NaN label scores have been replaced by ones.
     """
@@ -382,7 +412,7 @@ def replace_nan_groundtruth_label_scores_with_ones(label_scores):
 
 def filter_groundtruth_with_crowd_boxes(tensor_dict):
     """Filters out groundtruth with boxes corresponding to crowd.
-  
+
     Args:
       tensor_dict: a dictionary of following groundtruth tensors -
         fields.InputDataFields.groundtruth_boxes
@@ -390,7 +420,7 @@ def filter_groundtruth_with_crowd_boxes(tensor_dict):
         fields.InputDataFields.groundtruth_is_crowd
         fields.InputDataFields.groundtruth_area
         fields.InputDataFields.groundtruth_label_types
-  
+
     Returns:
       a dictionary of tensors containing only the groundtruth that have bounding
       boxes.
@@ -405,7 +435,7 @@ def filter_groundtruth_with_crowd_boxes(tensor_dict):
 
 def filter_groundtruth_with_nan_box_coordinates(tensor_dict):
     """Filters out groundtruth with no bounding boxes.
-  
+
     Args:
       tensor_dict: a dictionary of following groundtruth tensors -
         fields.InputDataFields.groundtruth_boxes
@@ -414,7 +444,7 @@ def filter_groundtruth_with_nan_box_coordinates(tensor_dict):
         fields.InputDataFields.groundtruth_is_crowd
         fields.InputDataFields.groundtruth_area
         fields.InputDataFields.groundtruth_label_types
-  
+
     Returns:
       a dictionary of tensors containing only the groundtruth that have bounding
       boxes.
@@ -436,18 +466,18 @@ def normalize_to_target(inputs,
                         scope='NormalizeToTarget',
                         summarize=True):
     """L2 normalizes the inputs across the specified dimension to a target norm.
-  
+
     This op implements the L2 Normalization layer introduced in
     Liu, Wei, et al. "SSD: Single Shot MultiBox Detector."
     and Liu, Wei, Andrew Rabinovich, and Alexander C. Berg.
     "Parsenet: Looking wider to see better." and is useful for bringing
     activations from multiple layers in a convnet to a standard scale.
-  
+
     Note that the rank of `inputs` must be known and the dimension to which
     normalization is to be applied should be statically defined.
-  
+
     TODO: Add option to scale by L2 norm of the entire input.
-  
+
     Args:
       inputs: A `Tensor` of arbitrary size.
       target_norm_value: A float value that specifies an initial target norm or
@@ -459,10 +489,10 @@ def normalize_to_target(inputs,
       trainable: Whether the norm is trainable or not
       scope: Optional scope for variable_scope.
       summarize: Whether or not to add a tensorflow summary for the op.
-  
+
     Returns:
       The input tensor normalized to the specified target norm.
-  
+
     Raises:
       ValueError: If dim is smaller than the number of dimensions in 'inputs'.
       ValueError: If target_norm_value is not a float or a list of floats with
@@ -513,22 +543,22 @@ def position_sensitive_crop_regions(image,
                                     global_pool,
                                     extrapolation_value=None):
     """Position-sensitive crop and pool rectangular regions from a feature grid.
-  
+
     The output crops are split into `spatial_bins_y` vertical bins
     and `spatial_bins_x` horizontal bins. For each intersection of a vertical
     and a horizontal bin the output values are gathered by performing
     `tf.image.crop_and_resize` (bilinear resampling) on a a separate subset of
     channels of the image. This reduces `depth` by a factor of
     `(spatial_bins_y * spatial_bins_x)`.
-  
+
     When global_pool is True, this function implements a differentiable version
     of position-sensitive RoI pooling used in
     [R-FCN detection system](https://arxiv.org/abs/1605.06409).
-  
+
     When global_pool is False, this function implements a differentiable version
     of position-sensitive assembling operation used in
     [instance FCN](https://arxiv.org/abs/1603.08678).
-  
+
     Args:
       image: A `Tensor`. Must be one of the following types: `uint8`, `int8`,
         `int16`, `int32`, `int64`, `half`, `float32`, `float64`.
@@ -629,7 +659,7 @@ def position_sensitive_crop_regions(image,
         position_sensitive_features = tf.add_n(image_crops) / len(image_crops)
         # Then average over spatial positions within the bins.
         position_sensitive_features = tf.reduce_mean(
-            position_sensitive_features, [1, 2], keep_dims=True)
+            position_sensitive_features, [1, 2], keepdims=True)
     else:
         # Reorder height/width to depth channel.
         block_size = bin_crop_size[0]
@@ -658,10 +688,10 @@ def position_sensitive_crop_regions(image,
 def reframe_box_masks_to_image_masks(box_masks, boxes, image_height,
                                      image_width):
     """Transforms the box masks back to full image masks.
-  
+
     Embeds masks in bounding boxes of larger masks whose shapes correspond to
     image shape.
-  
+
     Args:
       box_masks: A tf.float32 tensor of size [num_masks, mask_height, mask_width].
       boxes: A tf.float32 tensor of size [num_masks, 4] containing the box
@@ -672,7 +702,7 @@ def reframe_box_masks_to_image_masks(box_masks, boxes, image_height,
                     the image height.
       image_width: Image width. The output mask will have the same width as the
                    image width.
-  
+
     Returns:
       A tf.float32 tensor of size [num_masks, image_height, image_width].
     """
@@ -700,13 +730,13 @@ def reframe_box_masks_to_image_masks(box_masks, boxes, image_height,
 
 def merge_boxes_with_multiple_labels(boxes, classes, num_classes):
     """Merges boxes with same coordinates and returns K-hot encoded classes.
-  
+
     Args:
       boxes: A tf.float32 tensor with shape [N, 4] holding N boxes.
       classes: A tf.int32 tensor with shape [N] holding class indices.
         The class index starts at 0.
       num_classes: total number of classes to use for K-hot encoding.
-  
+
     Returns:
       merged_boxes: A tf.float32 tensor with shape [N', 4] holding boxes,
         where N' <= N.
@@ -743,3 +773,54 @@ def merge_boxes_with_multiple_labels(boxes, classes, num_classes):
     class_encodings = tf.reshape(class_encodings, [-1, num_classes])
     merged_box_indices = tf.reshape(merged_box_indices, [-1])
     return merged_boxes, class_encodings, merged_box_indices
+
+
+def nearest_neighbor_upsampling(input_tensor, scale):
+    """Nearest neighbor upsampling implementation.
+
+    Nearest neighbor upsampling function that maps input tensor with shape
+    [batch_size, height, width, channels] to [batch_size, height * scale
+    , width * scale, channels]. This implementation only uses reshape and tile to
+    make it compatible with certain hardware.
+
+    Args:
+      input_tensor: A float32 tensor of size [batch, height_in, width_in,
+        channels].
+      scale: An integer multiple to scale resolution of input data.
+    Returns:
+      data_up: A float32 tensor of size
+        [batch, height_in*scale, width_in*scale, channels].
+    """
+    shape = shape_utils.combined_static_and_dynamic_shape(input_tensor)
+    shape_before_tile = [shape[0], shape[1], 1, shape[2], 1, shape[3]]
+    shape_after_tile = [shape[0], shape[1] * scale, shape[2] * scale, shape[3]]
+    data_reshaped = tf.reshape(input_tensor, shape_before_tile)
+    resized_tensor = tf.tile(data_reshaped, [1, 1, scale, 1, scale, 1])
+    resized_tensor = tf.reshape(resized_tensor, shape_after_tile)
+    return resized_tensor
+
+
+def matmul_gather_on_zeroth_axis(params, indices, scope=None):
+    """Matrix multiplication based implementation of tf.gather on zeroth axis.
+
+    TODO(rathodv, jonathanhuang): enable sparse matmul option.
+
+    Args:
+      params: A float32 Tensor. The tensor from which to gather values.
+        Must be at least rank 1.
+      indices: A Tensor. Must be one of the following types: int32, int64.
+        Must be in range [0, params.shape[0])
+      scope: A name for the operation (optional).
+
+    Returns:
+      A Tensor. Has the same type as params. Values from params gathered
+      from indices given by indices, with shape indices.shape + params.shape[1:].
+    """
+    with tf.name_scope(scope, 'MatMulGather'):
+        params_shape = shape_utils.combined_static_and_dynamic_shape(params)
+        indices_shape = shape_utils.combined_static_and_dynamic_shape(indices)
+        params2d = tf.reshape(params, [params_shape[0], -1])
+        indicator_matrix = tf.one_hot(indices, params_shape[0])
+        gathered_result_flattened = tf.matmul(indicator_matrix, params2d)
+        return tf.reshape(gathered_result_flattened,
+                          tf.stack(indices_shape + params_shape[1:]))

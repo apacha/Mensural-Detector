@@ -25,38 +25,38 @@ from nets.nasnet import nasnet_utils
 
 class NasnetUtilsTest(tf.test.TestCase):
 
-  def testCalcReductionLayers(self):
-    num_cells = 18
-    num_reduction_layers = 2
-    reduction_layers = nasnet_utils.calc_reduction_layers(
-        num_cells, num_reduction_layers)
-    self.assertEqual(len(reduction_layers), 2)
-    self.assertEqual(reduction_layers[0], 6)
-    self.assertEqual(reduction_layers[1], 12)
+    def testCalcReductionLayers(self):
+        num_cells = 18
+        num_reduction_layers = 2
+        reduction_layers = nasnet_utils.calc_reduction_layers(
+            num_cells, num_reduction_layers)
+        self.assertEqual(len(reduction_layers), 2)
+        self.assertEqual(reduction_layers[0], 6)
+        self.assertEqual(reduction_layers[1], 12)
 
-  def testGetChannelIndex(self):
-    data_formats = ['NHWC', 'NCHW']
-    for data_format in data_formats:
-      index = nasnet_utils.get_channel_index(data_format)
-      correct_index = 3 if data_format == 'NHWC' else 1
-      self.assertEqual(index, correct_index)
+    def testGetChannelIndex(self):
+        data_formats = ['NHWC', 'NCHW']
+        for data_format in data_formats:
+            index = nasnet_utils.get_channel_index(data_format)
+            correct_index = 3 if data_format == 'NHWC' else 1
+            self.assertEqual(index, correct_index)
 
-  def testGetChannelDim(self):
-    data_formats = ['NHWC', 'NCHW']
-    shape = [10, 20, 30, 40]
-    for data_format in data_formats:
-      dim = nasnet_utils.get_channel_dim(shape, data_format)
-      correct_dim = shape[3] if data_format == 'NHWC' else shape[1]
-      self.assertEqual(dim, correct_dim)
+    def testGetChannelDim(self):
+        data_formats = ['NHWC', 'NCHW']
+        shape = [10, 20, 30, 40]
+        for data_format in data_formats:
+            dim = nasnet_utils.get_channel_dim(shape, data_format)
+            correct_dim = shape[3] if data_format == 'NHWC' else shape[1]
+            self.assertEqual(dim, correct_dim)
 
-  def testGlobalAvgPool(self):
-    data_formats = ['NHWC', 'NCHW']
-    inputs = tf.placeholder(tf.float32, (5, 10, 20, 10))
-    for data_format in data_formats:
-      output = nasnet_utils.global_avg_pool(
-          inputs, data_format)
-      self.assertEqual(output.shape, [5, 10])
+    def testGlobalAvgPool(self):
+        data_formats = ['NHWC', 'NCHW']
+        inputs = tf.placeholder(tf.float32, (5, 10, 20, 10))
+        for data_format in data_formats:
+            output = nasnet_utils.global_avg_pool(
+                inputs, data_format)
+            self.assertEqual(output.shape, [5, 10])
 
 
 if __name__ == '__main__':
-  tf.test.main()
+    tf.test.main()

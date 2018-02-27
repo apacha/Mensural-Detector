@@ -17,19 +17,20 @@
 
 from object_detection.anchor_generators import grid_anchor_generator
 from object_detection.anchor_generators import multiple_grid_anchor_generator
+from object_detection.anchor_generators import multiscale_grid_anchor_generator
 from object_detection.protos import anchor_generator_pb2
 
 
 def build(anchor_generator_config):
     """Builds an anchor generator based on the config.
-  
+
     Args:
       anchor_generator_config: An anchor_generator.proto object containing the
         config for the desired anchor generator.
-  
+
     Returns:
       Anchor generator based on the config.
-  
+
     Raises:
       ValueError: On empty anchor generator proto.
     """
@@ -78,5 +79,15 @@ def build(anchor_generator_config):
             anchor_offsets=anchor_offsets,
             reduce_boxes_in_lowest_layer=(
                 ssd_anchor_generator_config.reduce_boxes_in_lowest_layer))
+    elif anchor_generator_config.WhichOneof(
+            'anchor_generator_oneof') == 'multiscale_anchor_generator':
+        cfg = anchor_generator_config.multiscale_anchor_generator
+        return multiscale_grid_anchor_generator.MultiscaleGridAnchorGenerator(
+            cfg.min_level,
+            cfg.max_level,
+            cfg.anchor_scale,
+            [float(aspect_ratio) for aspect_ratio in cfg.aspect_ratios],
+            cfg.scales_per_octave
+        )
     else:
         raise ValueError('Empty anchor generator.')

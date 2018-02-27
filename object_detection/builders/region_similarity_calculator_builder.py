@@ -21,17 +21,17 @@ from object_detection.protos import region_similarity_calculator_pb2
 
 def build(region_similarity_calculator_config):
     """Builds region similarity calculator based on the configuration.
-  
+
     Builds one of [IouSimilarity, IoaSimilarity, NegSqDistSimilarity] objects. See
     core/region_similarity_calculator.proto for details.
-  
+
     Args:
       region_similarity_calculator_config: RegionSimilarityCalculator
         configuration proto.
-  
+
     Returns:
       region_similarity_calculator: RegionSimilarityCalculator object.
-  
+
     Raises:
       ValueError: On unknown region similarity calculator.
     """

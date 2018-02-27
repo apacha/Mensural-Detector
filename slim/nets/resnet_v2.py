@@ -62,14 +62,14 @@ resnet_arg_scope = resnet_utils.resnet_arg_scope
 def bottleneck(inputs, depth, depth_bottleneck, stride, rate=1,
                outputs_collections=None, scope=None):
     """Bottleneck residual unit variant with BN before convolutions.
-
+  
     This is the full preactivation residual unit variant proposed in [2]. See
     Fig. 1(b) of [2] for its definition. Note that we use here the bottleneck
     variant which has an extra bottleneck layer.
-
+  
     When putting together two consecutive ResNet blocks that use this unit, one
     should use stride = 2 in the last unit of the first block.
-
+  
     Args:
       inputs: A tensor of size [batch, height, width, channels].
       depth: The depth of the ResNet unit output.
@@ -79,7 +79,7 @@ def bottleneck(inputs, depth, depth_bottleneck, stride, rate=1,
       rate: An integer, rate for atrous convolution.
       outputs_collections: Collection to add the ResNet unit output.
       scope: Optional variable_scope.
-
+  
     Returns:
       The ResNet unit's output.
     """
@@ -119,11 +119,11 @@ def resnet_v2(inputs,
               reuse=None,
               scope=None):
     """Generator for v2 (preactivation) ResNet models.
-
+  
     This function generates a family of ResNet v2 models. See the resnet_v2_*()
     methods for specific model instantiations, obtained by selecting different
     block instantiations that produce ResNets of various depths.
-
+  
     Training for image classification on Imagenet is usually done with [224, 224]
     inputs, resulting in [7, 7] feature maps at the output of the last ResNet
     block for the ResNets defined in [1] that have nominal stride equal to 32.
@@ -134,13 +134,13 @@ def resnet_v2(inputs,
     and corners exactly aligned with the input image corners, which greatly
     facilitates alignment of the features to the image. Using as input [225, 225]
     images results in [8, 8] feature maps at the output of the last ResNet block.
-
+  
     For dense prediction tasks, the ResNet needs to run in fully-convolutional
     (FCN) mode and global_pool needs to be set to False. The ResNets in [1, 2] all
     have nominal stride equal to 32 and a good choice in FCN mode is to use
     output_stride=16 in order to increase the density of the computed features at
     small computational and memory overhead, cf. http://arxiv.org/abs/1606.00915.
-
+  
     Args:
       inputs: A tensor of size [batch, height_in, width_in, channels].
       blocks: A list of length equal to the number of ResNet blocks. Each element
@@ -164,8 +164,8 @@ def resnet_v2(inputs,
       reuse: whether or not the network and its variables should be reused. To be
         able to reuse 'scope' must be given.
       scope: Optional variable_scope.
-
-
+  
+  
     Returns:
       net: A rank-4 tensor of size [batch, height_out, width_out, channels_out].
         If global_pool is False, then height_out and width_out are reduced by a
@@ -176,7 +176,7 @@ def resnet_v2(inputs,
         pre-softmax activations.
       end_points: A dictionary from components of the network to the corresponding
         activation.
-
+  
     Raises:
       ValueError: If the target output_stride is not valid.
     """
@@ -228,14 +228,14 @@ resnet_v2.default_image_size = 224
 
 def resnet_v2_block(scope, base_depth, num_units, stride):
     """Helper function for creating a resnet_v2 bottleneck block.
-
+  
     Args:
       scope: The scope of the block.
       base_depth: The depth of the bottleneck layer for each unit.
       num_units: The number of units in the block.
       stride: The stride of the block, implemented as a stride in the last unit.
         All other units have stride=1.
-
+  
     Returns:
       A resnet_v2 bottleneck block.
     """

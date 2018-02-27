@@ -25,17 +25,18 @@ of final feature maps.
 """
 import collections
 import tensorflow as tf
+from object_detection.utils import ops
 
 slim = tf.contrib.slim
 
 
 def get_depth_fn(depth_multiplier, min_depth):
     """Builds a callable to compute depth (output channels) of conv filters.
-  
+
     Args:
       depth_multiplier: a multiplier for the nominal depth.
       min_depth: a lower bound on the depth of filters.
-  
+
     Returns:
       A callable that takes in a nominal depth and returns the depth to use.
     """
@@ -50,10 +51,10 @@ def get_depth_fn(depth_multiplier, min_depth):
 def multi_resolution_feature_maps(feature_map_layout, depth_multiplier,
                                   min_depth, insert_1x1_conv, image_features):
     """Generates multi resolution feature maps from input image features.
-  
+
     Generates multi-scale feature maps for detection as in the SSD papers by
     Liu et al: https://arxiv.org/pdf/1512.02325v2.pdf, See Sec 2.1.
-  
+
     More specifically, it performs the following two tasks:
     1) If a layer name is provided in the configuration, returns that layer as a
        feature map.
@@ -63,13 +64,13 @@ def multi_resolution_feature_maps(feature_map_layout, depth_multiplier,
        stride 2 resulting in a spatial resolution reduction by a factor of 2.
        By default convolution kernel size is set to 3, and it can be customized
        by caller.
-  
+
     An example of the configuration for Inception V3:
     {
       'from_layer': ['Mixed_5d', 'Mixed_6e', 'Mixed_7c', '', '', ''],
       'layer_depth': [-1, -1, -1, 512, 256, 128]
     }
-  
+
     Args:
       feature_map_layout: Dictionary of specifications for the feature map
         layouts in the following format (Inception V2/V3 respectively):
@@ -102,11 +103,11 @@ def multi_resolution_feature_maps(feature_map_layout, depth_multiplier,
         should be inserted before shrinking the feature map.
       image_features: A dictionary of handles to activation tensors from the
         base feature extractor.
-  
+
     Returns:
       feature_maps: an OrderedDict mapping keys (feature map names) to
         tensors where each tensor has shape [batch, height_i, width_i, depth_i].
-  
+
     Raises:
       ValueError: if the number entries in 'from_layer' and
         'layer_depth' do not match.
@@ -118,6 +119,9 @@ def multi_resolution_feature_maps(feature_map_layout, depth_multiplier,
     feature_map_keys = []
     feature_maps = []
     base_from_layer = ''
+    use_explicit_padding = False
+    if 'use_explicit_padding' in feature_map_layout:
+        use_explicit_padding = feature_map_layout['use_explicit_padding']
     use_depthwise = False
     if 'use_depthwise' in feature_map_layout:
         use_depthwise = feature_map_layout['use_depthwise']
@@ -142,16 +146,21 @@ def multi_resolution_feature_maps(feature_map_layout, depth_multiplier,
                     padding='SAME',
                     stride=1,
                     scope=layer_name)
-            stride = 2
             layer_name = '{}_2_Conv2d_{}_{}x{}_s2_{}'.format(
                 base_from_layer, index, conv_kernel_size, conv_kernel_size,
                 depth_fn(layer_depth))
+            stride = 2
+            padding = 'SAME'
+            if use_explicit_padding:
+                padding = 'VALID'
+                intermediate_layer = ops.fixed_padding(
+                    intermediate_layer, conv_kernel_size)
             if use_depthwise:
                 feature_map = slim.separable_conv2d(
                     intermediate_layer,
                     None, [conv_kernel_size, conv_kernel_size],
                     depth_multiplier=1,
-                    padding='SAME',
+                    padding=padding,
                     stride=stride,
                     scope=layer_name + '_depthwise')
                 feature_map = slim.conv2d(
@@ -164,10 +173,56 @@ def multi_resolution_feature_maps(feature_map_layout, depth_multiplier,
                 feature_map = slim.conv2d(
                     intermediate_layer,
                     depth_fn(layer_depth), [conv_kernel_size, conv_kernel_size],
-                    padding='SAME',
+                    padding=padding,
                     stride=stride,
                     scope=layer_name)
             feature_map_keys.append(layer_name)
         feature_maps.append(feature_map)
     return collections.OrderedDict(
         [(x, y) for (x, y) in zip(feature_map_keys, feature_maps)])
+
+
+def fpn_top_down_feature_maps(image_features, depth, scope=None):
+    """Generates `top-down` feature maps for Feature Pyramid Networks.
+
+    See https://arxiv.org/abs/1612.03144 for details.
+
+    Args:
+      image_features: list of image feature tensors. Spatial resolutions of
+        succesive tensors must reduce exactly by a factor of 2.
+      depth: depth of output feature maps.
+      scope: A scope name to wrap this op under.
+
+    Returns:
+      feature_maps: an OrderedDict mapping keys (feature map names) to
+        tensors where each tensor has shape [batch, height_i, width_i, depth_i].
+    """
+    with tf.variable_scope(
+            scope, 'top_down', image_features):
+        num_levels = len(image_features)
+        output_feature_maps_list = []
+        output_feature_map_keys = []
+        with slim.arg_scope(
+                [slim.conv2d],
+                activation_fn=None, normalizer_fn=None, padding='SAME', stride=1):
+            top_down = slim.conv2d(
+                image_features[-1],
+                depth, [1, 1], scope='projection_%d' % num_levels)
+            output_feature_maps_list.append(top_down)
+            output_feature_map_keys.append(
+                'top_down_feature_map_%d' % (num_levels - 1))
+
+            for level in reversed(range(num_levels - 1)):
+                top_down = ops.nearest_neighbor_upsampling(top_down, 2)
+                residual = slim.conv2d(
+                    image_features[level], depth, [1, 1],
+                    scope='projection_%d' % (level + 1))
+                top_down = 0.5 * top_down + 0.5 * residual
+                output_feature_maps_list.append(slim.conv2d(
+                    top_down,
+                    depth, [3, 3],
+                    activation_fn=None,
+                    scope='smoothing_%d' % (level + 1)))
+                output_feature_map_keys.append('top_down_feature_map_%d' % level)
+            return collections.OrderedDict(
+                reversed(zip(output_feature_map_keys, output_feature_maps_list)))

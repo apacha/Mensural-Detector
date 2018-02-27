@@ -21,10 +21,10 @@ from object_detection.protos import box_predictor_pb2
 
 def build(argscope_fn, box_predictor_config, is_training, num_classes):
     """Builds box predictor based on the configuration.
-  
+
     Builds box predictor based on the configuration. See box_predictor.proto for
     configurable options. Also, see box_predictor.py for more details.
-  
+
     Args:
       argscope_fn: A function that takes the following inputs:
           * hyperparams_pb2.Hyperparams proto
@@ -34,10 +34,10 @@ def build(argscope_fn, box_predictor_config, is_training, num_classes):
         configuration.
       is_training: Whether the models is in training mode.
       num_classes: Number of classes to predict.
-  
+
     Returns:
       box_predictor: box_predictor.BoxPredictor object.
-  
+
     Raises:
       ValueError: On unknown box predictor.
     """
@@ -64,6 +64,26 @@ def build(argscope_fn, box_predictor_config, is_training, num_classes):
             kernel_size=conv_box_predictor.kernel_size,
             box_code_size=conv_box_predictor.box_code_size,
             apply_sigmoid_to_scores=conv_box_predictor.apply_sigmoid_to_scores,
+            class_prediction_bias_init=(conv_box_predictor.
+                                        class_prediction_bias_init),
+            use_depthwise=conv_box_predictor.use_depthwise
+        )
+        return box_predictor_object
+
+    if box_predictor_oneof == 'weight_shared_convolutional_box_predictor':
+        conv_box_predictor = (box_predictor_config.
+                              weight_shared_convolutional_box_predictor)
+        conv_hyperparams = argscope_fn(conv_box_predictor.conv_hyperparams,
+                                       is_training)
+        box_predictor_object = box_predictor.WeightSharedConvolutionalBoxPredictor(
+            is_training=is_training,
+            num_classes=num_classes,
+            conv_hyperparams=conv_hyperparams,
+            depth=conv_box_predictor.depth,
+            num_layers_before_predictor=(conv_box_predictor.
+                                         num_layers_before_predictor),
+            kernel_size=conv_box_predictor.kernel_size,
+            box_code_size=conv_box_predictor.box_code_size,
             class_prediction_bias_init=conv_box_predictor.class_prediction_bias_init
         )
         return box_predictor_object
@@ -85,8 +105,12 @@ def build(argscope_fn, box_predictor_config, is_training, num_classes):
             box_code_size=mask_rcnn_box_predictor.box_code_size,
             conv_hyperparams=conv_hyperparams,
             predict_instance_masks=mask_rcnn_box_predictor.predict_instance_masks,
-            mask_prediction_conv_depth=(mask_rcnn_box_predictor.
-                                        mask_prediction_conv_depth),
+            mask_height=mask_rcnn_box_predictor.mask_height,
+            mask_width=mask_rcnn_box_predictor.mask_width,
+            mask_prediction_num_conv_layers=(
+                mask_rcnn_box_predictor.mask_prediction_num_conv_layers),
+            mask_prediction_conv_depth=(
+                mask_rcnn_box_predictor.mask_prediction_conv_depth),
             predict_keypoints=mask_rcnn_box_predictor.predict_keypoints)
         return box_predictor_object
 

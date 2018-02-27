@@ -61,10 +61,10 @@ def dict_to_tf_example(data,
                        ignore_difficult_instances=False,
                        image_subdirectory='JPEGImages'):
     """Convert XML derived dict to tf.Example proto.
-  
+
     Notice that this function normalizes the bounding box coordinates provided
     by the raw data.
-  
+
     Args:
       data: dict holding PASCAL XML fields for a single image (obtained by
         running dataset_util.recursive_parse_xml_to_dict)
@@ -74,10 +74,10 @@ def dict_to_tf_example(data,
         dataset  (default: False).
       image_subdirectory: String specifying subdirectory within the
         PASCAL dataset directory holding the actual image data.
-  
+
     Returns:
       example: The converted tf.Example.
-  
+
     Raises:
       ValueError: if the image pointed to by data['filename'] is not a valid JPEG
     """

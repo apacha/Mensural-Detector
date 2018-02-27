@@ -32,12 +32,12 @@ slim = tf.contrib.slim
 
 def nasnet_large_arg_scope_for_detection(is_batch_norm_training=False):
     """Defines the default arg scope for the NASNet-A Large for object detection.
-  
+
     This provides a small edit to switch batch norm training on and off.
-  
+
     Args:
       is_batch_norm_training: Boolean indicating whether to train with batch norm.
-  
+
     Returns:
       An `arg_scope` to use for the NASNet Large Model.
     """
@@ -123,14 +123,14 @@ class FasterRCNNNASFeatureExtractor(
                  reuse_weights=None,
                  weight_decay=0.0):
         """Constructor.
-    
+
         Args:
           is_training: See base class.
           first_stage_features_stride: See base class.
           batch_norm_trainable: See base class.
           reuse_weights: See base class.
           weight_decay: See base class.
-    
+
         Raises:
           ValueError: If `first_stage_features_stride` is not 16.
         """
@@ -142,33 +142,33 @@ class FasterRCNNNASFeatureExtractor(
 
     def preprocess(self, resized_inputs):
         """Faster R-CNN with NAS preprocessing.
-    
+
         Maps pixel values to the range [-1, 1].
-    
+
         Args:
           resized_inputs: A [batch, height_in, width_in, channels] float32 tensor
             representing a batch of images with values between 0 and 255.0.
-    
+
         Returns:
           preprocessed_inputs: A [batch, height_out, width_out, channels] float32
             tensor representing a batch of images.
-    
+
         """
         return (2.0 / 255.0) * resized_inputs - 1.0
 
     def _extract_proposal_features(self, preprocessed_inputs, scope):
         """Extracts first stage RPN features.
-    
+
         Extracts features using the first half of the NASNet network.
         We construct the network in `align_feature_maps=True` mode, which means
         that all VALID paddings in the network are changed to SAME padding so that
         the feature maps are aligned.
-    
+
         Args:
           preprocessed_inputs: A [batch, height, width, channels] float32 tensor
             representing a batch of images.
           scope: A scope name.
-    
+
         Returns:
           rpn_feature_map: A tensor with shape [batch, height, width, depth]
         Raises:
@@ -202,16 +202,16 @@ class FasterRCNNNASFeatureExtractor(
 
     def _extract_box_classifier_features(self, proposal_feature_maps, scope):
         """Extracts second stage box classifier features.
-    
+
         This function reconstructs the "second half" of the NASNet-A
         network after the part defined in `_extract_proposal_features`.
-    
+
         Args:
           proposal_feature_maps: A 4-D float tensor with shape
             [batch_size * self.max_num_proposals, crop_height, crop_width, depth]
             representing the feature map cropped to each proposal.
           scope: A scope name.
-    
+
         Returns:
           proposal_classifier_features: A 4-D float tensor with shape
             [batch_size * self.max_num_proposals, height, width, depth]
@@ -280,17 +280,17 @@ class FasterRCNNNASFeatureExtractor(
             first_stage_feature_extractor_scope,
             second_stage_feature_extractor_scope):
         """Returns a map of variables to load from a foreign checkpoint.
-    
+
         Note that this overrides the default implementation in
         faster_rcnn_meta_arch.FasterRCNNFeatureExtractor which does not work for
         NASNet-A checkpoints.
-    
+
         Args:
           first_stage_feature_extractor_scope: A scope name for the first stage
             feature extractor.
           second_stage_feature_extractor_scope: A scope name for the second stage
             feature extractor.
-    
+
         Returns:
           A dict mapping variable names (to load from a checkpoint) to variables in
           the model graph.

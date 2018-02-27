@@ -12,3 +12,4 @@ data
 /dist/
 /tensorflow_object_detection.egg-info/
 /object_detection.egg-info/
+BUILD

@@ -23,15 +23,15 @@ from object_detection.protos import preprocessor_pb2
 
 def _get_step_config_from_proto(preprocessor_step_config, step_name):
     """Returns the value of a field named step_name from proto.
-  
+
     Args:
       preprocessor_step_config: A preprocessor_pb2.PreprocessingStep object.
       step_name: Name of the field to get value from.
-  
+
     Returns:
       result_dict: a sub proto message from preprocessor_step_config which will be
                    later converted to a dictionary.
-  
+
     Raises:
       ValueError: If field does not exist in proto.
     """
@@ -44,20 +44,20 @@ def _get_step_config_from_proto(preprocessor_step_config, step_name):
 
 def _get_dict_from_proto(config):
     """Helper function to put all proto fields into a dictionary.
-  
+
     For many preprocessing steps, there's an trivial 1-1 mapping from proto fields
     to function arguments. This function automatically populates a dictionary with
     the arguments from the proto.
-  
+
     Protos that CANNOT be trivially populated include:
     * nested messages.
     * steps that check if an optional field is set (ie. where None != 0).
     * protos that don't map 1-1 to arguments (ie. list should be reshaped).
     * fields requiring additional validation (ie. repeated field has n elements).
-  
+
     Args:
       config: A protobuf object that does not violate the conditions above.
-  
+
     Returns:
       result_dict: |config| converted into a python dictionary.
     """
@@ -83,6 +83,7 @@ PREPROCESSING_FUNCTION_MAP = {
     'random_jitter_boxes': preprocessor.random_jitter_boxes,
     'random_crop_to_aspect_ratio': preprocessor.random_crop_to_aspect_ratio,
     'random_black_patches': preprocessor.random_black_patches,
+    'rgb_to_gray': preprocessor.rgb_to_gray,
     'scale_boxes_to_pixel_coordinates': (
         preprocessor.scale_boxes_to_pixel_coordinates),
     'subtract_channel_mean': preprocessor.subtract_channel_mean,
@@ -101,14 +102,14 @@ RESIZE_METHOD_MAP = {
 
 def build(preprocessor_step_config):
     """Builds preprocessing step based on the configuration.
-  
+
     Args:
       preprocessor_step_config: PreprocessingStep configuration proto.
-  
+
     Returns:
       function, argmap: A callable function and an argument map to call function
                         with.
-  
+
     Raises:
       ValueError: On invalid configuration.
     """
