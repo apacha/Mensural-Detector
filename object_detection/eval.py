@@ -97,15 +97,15 @@ def main(unused_argv):
     tf.gfile.MakeDirs(FLAGS.eval_dir)
     if FLAGS.pipeline_config_path:
         configs = config_util.get_configs_from_pipeline_file(
-                FLAGS.pipeline_config_path)
+            FLAGS.pipeline_config_path)
         tf.gfile.Copy(FLAGS.pipeline_config_path,
                       os.path.join(FLAGS.eval_dir, 'pipeline.config'),
                       overwrite=True)
     else:
         configs = config_util.get_configs_from_multiple_files(
-                model_config_path=FLAGS.model_config_path,
-                eval_config_path=FLAGS.eval_config_path,
-                eval_input_config_path=FLAGS.input_config_path)
+            model_config_path=FLAGS.model_config_path,
+            eval_config_path=FLAGS.eval_config_path,
+            eval_input_config_path=FLAGS.input_config_path)
         for name, config in [('model.config', FLAGS.model_config_path),
                              ('eval.config', FLAGS.eval_config_path),
                              ('input.config', FLAGS.input_config_path)]:
@@ -121,18 +121,18 @@ def main(unused_argv):
         input_config = configs['eval_input_config']
 
     model_fn = functools.partial(
-            model_builder.build,
-            model_config=model_config,
-            is_training=False)
+        model_builder.build,
+        model_config=model_config,
+        is_training=False)
 
     create_input_dict_fn = functools.partial(
-            input_reader_builder.build,
-            input_config)
+        input_reader_builder.build,
+        input_config)
 
     label_map = label_map_util.load_labelmap(input_config.label_map_path)
     max_num_classes = max([item.id for item in label_map.item])
     categories = label_map_util.convert_label_map_to_categories(
-            label_map, max_num_classes)
+        label_map, max_num_classes)
 
     if FLAGS.run_once:
         eval_config.max_evals = 1

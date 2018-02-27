@@ -58,47 +58,47 @@ FLAGS = tf.flags.FLAGS
 
 
 def main(_):
-  tf.logging.set_verbosity(tf.logging.INFO)
+    tf.logging.set_verbosity(tf.logging.INFO)
 
-  required_flags = [
-      'input_annotations_csv', 'input_images_directory', 'input_label_map',
-      'output_tf_record_path_prefix'
-  ]
-  for flag_name in required_flags:
-    if not getattr(FLAGS, flag_name):
-      raise ValueError('Flag --{} is required'.format(flag_name))
+    required_flags = [
+        'input_annotations_csv', 'input_images_directory', 'input_label_map',
+        'output_tf_record_path_prefix'
+    ]
+    for flag_name in required_flags:
+        if not getattr(FLAGS, flag_name):
+            raise ValueError('Flag --{} is required'.format(flag_name))
 
-  label_map = label_map_util.get_label_map_dict(FLAGS.input_label_map)
-  all_annotations = pd.read_csv(FLAGS.input_annotations_csv)
-  all_images = tf.gfile.Glob(
-      os.path.join(FLAGS.input_images_directory, '*.jpg'))
-  all_image_ids = [os.path.splitext(os.path.basename(v))[0] for v in all_images]
-  all_image_ids = pd.DataFrame({'ImageID': all_image_ids})
-  all_annotations = pd.concat([all_annotations, all_image_ids])
+    label_map = label_map_util.get_label_map_dict(FLAGS.input_label_map)
+    all_annotations = pd.read_csv(FLAGS.input_annotations_csv)
+    all_images = tf.gfile.Glob(
+        os.path.join(FLAGS.input_images_directory, '*.jpg'))
+    all_image_ids = [os.path.splitext(os.path.basename(v))[0] for v in all_images]
+    all_image_ids = pd.DataFrame({'ImageID': all_image_ids})
+    all_annotations = pd.concat([all_annotations, all_image_ids])
 
-  tf.logging.log(tf.logging.INFO, 'Found %d images...', len(all_image_ids))
+    tf.logging.log(tf.logging.INFO, 'Found %d images...', len(all_image_ids))
 
-  with contextlib2.ExitStack() as tf_record_close_stack:
-    output_tfrecords = oid_tfrecord_creation.open_sharded_output_tfrecords(
-        tf_record_close_stack, FLAGS.output_tf_record_path_prefix,
-        FLAGS.num_shards)
+    with contextlib2.ExitStack() as tf_record_close_stack:
+        output_tfrecords = oid_tfrecord_creation.open_sharded_output_tfrecords(
+            tf_record_close_stack, FLAGS.output_tf_record_path_prefix,
+            FLAGS.num_shards)
 
-    for counter, image_data in enumerate(all_annotations.groupby('ImageID')):
-      tf.logging.log_every_n(tf.logging.INFO, 'Processed %d images...', 1000,
-                             counter)
+        for counter, image_data in enumerate(all_annotations.groupby('ImageID')):
+            tf.logging.log_every_n(tf.logging.INFO, 'Processed %d images...', 1000,
+                                   counter)
 
-      image_id, image_annotations = image_data
-      # In OID image file names are formed by appending ".jpg" to the image ID.
-      image_path = os.path.join(FLAGS.input_images_directory, image_id + '.jpg')
-      with tf.gfile.Open(image_path) as image_file:
-        encoded_image = image_file.read()
+            image_id, image_annotations = image_data
+            # In OID image file names are formed by appending ".jpg" to the image ID.
+            image_path = os.path.join(FLAGS.input_images_directory, image_id + '.jpg')
+            with tf.gfile.Open(image_path) as image_file:
+                encoded_image = image_file.read()
 
-      tf_example = oid_tfrecord_creation.tf_example_from_annotations_data_frame(
-          image_annotations, label_map, encoded_image)
-      if tf_example:
-        shard_idx = long(image_id, 16) % FLAGS.num_shards
-        output_tfrecords[shard_idx].write(tf_example.SerializeToString())
+            tf_example = oid_tfrecord_creation.tf_example_from_annotations_data_frame(
+                image_annotations, label_map, encoded_image)
+            if tf_example:
+                shard_idx = long(image_id, 16) % FLAGS.num_shards
+                output_tfrecords[shard_idx].write(tf_example.SerializeToString())
 
 
 if __name__ == '__main__':
-  tf.app.run()
+    tf.app.run()

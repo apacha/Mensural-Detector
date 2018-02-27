@@ -25,21 +25,21 @@ from object_detection.protos import optimizer_pb2
 
 class LearningRateBuilderTest(tf.test.TestCase):
 
-  def testBuildConstantLearningRate(self):
-    learning_rate_text_proto = """
+    def testBuildConstantLearningRate(self):
+        learning_rate_text_proto = """
       constant_learning_rate {
         learning_rate: 0.004
       }
     """
-    global_summaries = set([])
-    learning_rate_proto = optimizer_pb2.LearningRate()
-    text_format.Merge(learning_rate_text_proto, learning_rate_proto)
-    learning_rate = optimizer_builder._create_learning_rate(
-        learning_rate_proto, global_summaries)
-    self.assertAlmostEqual(learning_rate, 0.004)
+        global_summaries = set([])
+        learning_rate_proto = optimizer_pb2.LearningRate()
+        text_format.Merge(learning_rate_text_proto, learning_rate_proto)
+        learning_rate = optimizer_builder._create_learning_rate(
+            learning_rate_proto, global_summaries)
+        self.assertAlmostEqual(learning_rate, 0.004)
 
-  def testBuildExponentialDecayLearningRate(self):
-    learning_rate_text_proto = """
+    def testBuildExponentialDecayLearningRate(self):
+        learning_rate_text_proto = """
       exponential_decay_learning_rate {
         initial_learning_rate: 0.004
         decay_steps: 99999
@@ -47,15 +47,15 @@ class LearningRateBuilderTest(tf.test.TestCase):
         staircase: false
       }
     """
-    global_summaries = set([])
-    learning_rate_proto = optimizer_pb2.LearningRate()
-    text_format.Merge(learning_rate_text_proto, learning_rate_proto)
-    learning_rate = optimizer_builder._create_learning_rate(
-        learning_rate_proto, global_summaries)
-    self.assertTrue(isinstance(learning_rate, tf.Tensor))
+        global_summaries = set([])
+        learning_rate_proto = optimizer_pb2.LearningRate()
+        text_format.Merge(learning_rate_text_proto, learning_rate_proto)
+        learning_rate = optimizer_builder._create_learning_rate(
+            learning_rate_proto, global_summaries)
+        self.assertTrue(isinstance(learning_rate, tf.Tensor))
 
-  def testBuildManualStepLearningRate(self):
-    learning_rate_text_proto = """
+    def testBuildManualStepLearningRate(self):
+        learning_rate_text_proto = """
       manual_step_learning_rate {
         schedule {
           step: 0
@@ -67,15 +67,15 @@ class LearningRateBuilderTest(tf.test.TestCase):
         }
       }
     """
-    global_summaries = set([])
-    learning_rate_proto = optimizer_pb2.LearningRate()
-    text_format.Merge(learning_rate_text_proto, learning_rate_proto)
-    learning_rate = optimizer_builder._create_learning_rate(
-        learning_rate_proto, global_summaries)
-    self.assertTrue(isinstance(learning_rate, tf.Tensor))
+        global_summaries = set([])
+        learning_rate_proto = optimizer_pb2.LearningRate()
+        text_format.Merge(learning_rate_text_proto, learning_rate_proto)
+        learning_rate = optimizer_builder._create_learning_rate(
+            learning_rate_proto, global_summaries)
+        self.assertTrue(isinstance(learning_rate, tf.Tensor))
 
-  def testBuildCosineDecayLearningRate(self):
-    learning_rate_text_proto = """
+    def testBuildCosineDecayLearningRate(self):
+        learning_rate_text_proto = """
       cosine_decay_learning_rate {
         learning_rate_base: 0.002
         total_steps: 20000
@@ -83,28 +83,28 @@ class LearningRateBuilderTest(tf.test.TestCase):
         warmup_steps: 1000
       }
     """
-    global_summaries = set([])
-    learning_rate_proto = optimizer_pb2.LearningRate()
-    text_format.Merge(learning_rate_text_proto, learning_rate_proto)
-    learning_rate = optimizer_builder._create_learning_rate(
-        learning_rate_proto, global_summaries)
-    self.assertTrue(isinstance(learning_rate, tf.Tensor))
+        global_summaries = set([])
+        learning_rate_proto = optimizer_pb2.LearningRate()
+        text_format.Merge(learning_rate_text_proto, learning_rate_proto)
+        learning_rate = optimizer_builder._create_learning_rate(
+            learning_rate_proto, global_summaries)
+        self.assertTrue(isinstance(learning_rate, tf.Tensor))
 
-  def testRaiseErrorOnEmptyLearningRate(self):
-    learning_rate_text_proto = """
+    def testRaiseErrorOnEmptyLearningRate(self):
+        learning_rate_text_proto = """
     """
-    global_summaries = set([])
-    learning_rate_proto = optimizer_pb2.LearningRate()
-    text_format.Merge(learning_rate_text_proto, learning_rate_proto)
-    with self.assertRaises(ValueError):
-      optimizer_builder._create_learning_rate(
-          learning_rate_proto, global_summaries)
+        global_summaries = set([])
+        learning_rate_proto = optimizer_pb2.LearningRate()
+        text_format.Merge(learning_rate_text_proto, learning_rate_proto)
+        with self.assertRaises(ValueError):
+            optimizer_builder._create_learning_rate(
+                learning_rate_proto, global_summaries)
 
 
 class OptimizerBuilderTest(tf.test.TestCase):
 
-  def testBuildRMSPropOptimizer(self):
-    optimizer_text_proto = """
+    def testBuildRMSPropOptimizer(self):
+        optimizer_text_proto = """
       rms_prop_optimizer: {
         learning_rate: {
           exponential_decay_learning_rate {
@@ -119,14 +119,14 @@ class OptimizerBuilderTest(tf.test.TestCase):
       }
       use_moving_average: false
     """
-    global_summaries = set([])
-    optimizer_proto = optimizer_pb2.Optimizer()
-    text_format.Merge(optimizer_text_proto, optimizer_proto)
-    optimizer = optimizer_builder.build(optimizer_proto, global_summaries)
-    self.assertTrue(isinstance(optimizer, tf.train.RMSPropOptimizer))
+        global_summaries = set([])
+        optimizer_proto = optimizer_pb2.Optimizer()
+        text_format.Merge(optimizer_text_proto, optimizer_proto)
+        optimizer = optimizer_builder.build(optimizer_proto, global_summaries)
+        self.assertTrue(isinstance(optimizer, tf.train.RMSPropOptimizer))
 
-  def testBuildMomentumOptimizer(self):
-    optimizer_text_proto = """
+    def testBuildMomentumOptimizer(self):
+        optimizer_text_proto = """
       momentum_optimizer: {
         learning_rate: {
           constant_learning_rate {
@@ -137,14 +137,14 @@ class OptimizerBuilderTest(tf.test.TestCase):
       }
       use_moving_average: false
     """
-    global_summaries = set([])
-    optimizer_proto = optimizer_pb2.Optimizer()
-    text_format.Merge(optimizer_text_proto, optimizer_proto)
-    optimizer = optimizer_builder.build(optimizer_proto, global_summaries)
-    self.assertTrue(isinstance(optimizer, tf.train.MomentumOptimizer))
+        global_summaries = set([])
+        optimizer_proto = optimizer_pb2.Optimizer()
+        text_format.Merge(optimizer_text_proto, optimizer_proto)
+        optimizer = optimizer_builder.build(optimizer_proto, global_summaries)
+        self.assertTrue(isinstance(optimizer, tf.train.MomentumOptimizer))
 
-  def testBuildAdamOptimizer(self):
-    optimizer_text_proto = """
+    def testBuildAdamOptimizer(self):
+        optimizer_text_proto = """
       adam_optimizer: {
         learning_rate: {
           constant_learning_rate {
@@ -154,14 +154,14 @@ class OptimizerBuilderTest(tf.test.TestCase):
       }
       use_moving_average: false
     """
-    global_summaries = set([])
-    optimizer_proto = optimizer_pb2.Optimizer()
-    text_format.Merge(optimizer_text_proto, optimizer_proto)
-    optimizer = optimizer_builder.build(optimizer_proto, global_summaries)
-    self.assertTrue(isinstance(optimizer, tf.train.AdamOptimizer))
+        global_summaries = set([])
+        optimizer_proto = optimizer_pb2.Optimizer()
+        text_format.Merge(optimizer_text_proto, optimizer_proto)
+        optimizer = optimizer_builder.build(optimizer_proto, global_summaries)
+        self.assertTrue(isinstance(optimizer, tf.train.AdamOptimizer))
 
-  def testBuildMovingAverageOptimizer(self):
-    optimizer_text_proto = """
+    def testBuildMovingAverageOptimizer(self):
+        optimizer_text_proto = """
       adam_optimizer: {
         learning_rate: {
           constant_learning_rate {
@@ -171,15 +171,15 @@ class OptimizerBuilderTest(tf.test.TestCase):
       }
       use_moving_average: True
     """
-    global_summaries = set([])
-    optimizer_proto = optimizer_pb2.Optimizer()
-    text_format.Merge(optimizer_text_proto, optimizer_proto)
-    optimizer = optimizer_builder.build(optimizer_proto, global_summaries)
-    self.assertTrue(
-        isinstance(optimizer, tf.contrib.opt.MovingAverageOptimizer))
+        global_summaries = set([])
+        optimizer_proto = optimizer_pb2.Optimizer()
+        text_format.Merge(optimizer_text_proto, optimizer_proto)
+        optimizer = optimizer_builder.build(optimizer_proto, global_summaries)
+        self.assertTrue(
+            isinstance(optimizer, tf.contrib.opt.MovingAverageOptimizer))
 
-  def testBuildMovingAverageOptimizerWithNonDefaultDecay(self):
-    optimizer_text_proto = """
+    def testBuildMovingAverageOptimizerWithNonDefaultDecay(self):
+        optimizer_text_proto = """
       adam_optimizer: {
         learning_rate: {
           constant_learning_rate {
@@ -190,24 +190,24 @@ class OptimizerBuilderTest(tf.test.TestCase):
       use_moving_average: True
       moving_average_decay: 0.2
     """
-    global_summaries = set([])
-    optimizer_proto = optimizer_pb2.Optimizer()
-    text_format.Merge(optimizer_text_proto, optimizer_proto)
-    optimizer = optimizer_builder.build(optimizer_proto, global_summaries)
-    self.assertTrue(
-        isinstance(optimizer, tf.contrib.opt.MovingAverageOptimizer))
-    # TODO(rathodv): Find a way to not depend on the private members.
-    self.assertAlmostEqual(optimizer._ema._decay, 0.2)
+        global_summaries = set([])
+        optimizer_proto = optimizer_pb2.Optimizer()
+        text_format.Merge(optimizer_text_proto, optimizer_proto)
+        optimizer = optimizer_builder.build(optimizer_proto, global_summaries)
+        self.assertTrue(
+            isinstance(optimizer, tf.contrib.opt.MovingAverageOptimizer))
+        # TODO(rathodv): Find a way to not depend on the private members.
+        self.assertAlmostEqual(optimizer._ema._decay, 0.2)
 
-  def testBuildEmptyOptimizer(self):
-    optimizer_text_proto = """
+    def testBuildEmptyOptimizer(self):
+        optimizer_text_proto = """
     """
-    global_summaries = set([])
-    optimizer_proto = optimizer_pb2.Optimizer()
-    text_format.Merge(optimizer_text_proto, optimizer_proto)
-    with self.assertRaises(ValueError):
-      optimizer_builder.build(optimizer_proto, global_summaries)
+        global_summaries = set([])
+        optimizer_proto = optimizer_pb2.Optimizer()
+        text_format.Merge(optimizer_text_proto, optimizer_proto)
+        with self.assertRaises(ValueError):
+            optimizer_builder.build(optimizer_proto, global_summaries)
 
 
 if __name__ == '__main__':
-  tf.test.main()
+    tf.test.main()

@@ -25,43 +25,43 @@ from object_detection.protos import region_similarity_calculator_pb2 as sim_calc
 
 class RegionSimilarityCalculatorBuilderTest(tf.test.TestCase):
 
-  def testBuildIoaSimilarityCalculator(self):
-    similarity_calc_text_proto = """
+    def testBuildIoaSimilarityCalculator(self):
+        similarity_calc_text_proto = """
       ioa_similarity {
       }
     """
-    similarity_calc_proto = sim_calc_pb2.RegionSimilarityCalculator()
-    text_format.Merge(similarity_calc_text_proto, similarity_calc_proto)
-    similarity_calc = region_similarity_calculator_builder.build(
-        similarity_calc_proto)
-    self.assertTrue(isinstance(similarity_calc,
-                               region_similarity_calculator.IoaSimilarity))
+        similarity_calc_proto = sim_calc_pb2.RegionSimilarityCalculator()
+        text_format.Merge(similarity_calc_text_proto, similarity_calc_proto)
+        similarity_calc = region_similarity_calculator_builder.build(
+            similarity_calc_proto)
+        self.assertTrue(isinstance(similarity_calc,
+                                   region_similarity_calculator.IoaSimilarity))
 
-  def testBuildIouSimilarityCalculator(self):
-    similarity_calc_text_proto = """
+    def testBuildIouSimilarityCalculator(self):
+        similarity_calc_text_proto = """
       iou_similarity {
       }
     """
-    similarity_calc_proto = sim_calc_pb2.RegionSimilarityCalculator()
-    text_format.Merge(similarity_calc_text_proto, similarity_calc_proto)
-    similarity_calc = region_similarity_calculator_builder.build(
-        similarity_calc_proto)
-    self.assertTrue(isinstance(similarity_calc,
-                               region_similarity_calculator.IouSimilarity))
+        similarity_calc_proto = sim_calc_pb2.RegionSimilarityCalculator()
+        text_format.Merge(similarity_calc_text_proto, similarity_calc_proto)
+        similarity_calc = region_similarity_calculator_builder.build(
+            similarity_calc_proto)
+        self.assertTrue(isinstance(similarity_calc,
+                                   region_similarity_calculator.IouSimilarity))
 
-  def testBuildNegSqDistSimilarityCalculator(self):
-    similarity_calc_text_proto = """
+    def testBuildNegSqDistSimilarityCalculator(self):
+        similarity_calc_text_proto = """
       neg_sq_dist_similarity {
       }
     """
-    similarity_calc_proto = sim_calc_pb2.RegionSimilarityCalculator()
-    text_format.Merge(similarity_calc_text_proto, similarity_calc_proto)
-    similarity_calc = region_similarity_calculator_builder.build(
-        similarity_calc_proto)
-    self.assertTrue(isinstance(similarity_calc,
-                               region_similarity_calculator.
-                               NegSqDistSimilarity))
+        similarity_calc_proto = sim_calc_pb2.RegionSimilarityCalculator()
+        text_format.Merge(similarity_calc_text_proto, similarity_calc_proto)
+        similarity_calc = region_similarity_calculator_builder.build(
+            similarity_calc_proto)
+        self.assertTrue(isinstance(similarity_calc,
+                                   region_similarity_calculator.
+                                   NegSqDistSimilarity))
 
 
 if __name__ == '__main__':
-  tf.test.main()
+    tf.test.main()

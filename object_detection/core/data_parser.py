@@ -25,17 +25,17 @@ from abc import abstractmethod
 
 
 class DataToNumpyParser(object):
-  __metaclass__ = ABCMeta
+    __metaclass__ = ABCMeta
 
-  @abstractmethod
-  def parse(self, input_data):
-    """Parses input and returns a numpy array or a dictionary of numpy arrays.
+    @abstractmethod
+    def parse(self, input_data):
+        """Parses input and returns a numpy array or a dictionary of numpy arrays.
 
-    Args:
-      input_data: an input data
+        Args:
+          input_data: an input data
 
-    Returns:
-      A numpy array or a dictionary of numpy arrays or None, if input
-      cannot be parsed.
-    """
-    pass
+        Returns:
+          A numpy array or a dictionary of numpy arrays or None, if input
+          cannot be parsed.
+        """
+        pass
