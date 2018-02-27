@@ -28,7 +28,7 @@ Now build the required libraries:
 
 ```commandline
 cd Mensural-Detector
-protoc tensorflow_object_detection/protos/*.proto --python_out=.
+protoc object_detection/protos/*.proto --python_out=.
 cd slim
 python setup.py install
 cd ..

@@ -1,5 +1,5 @@
 $pathToGitRoot = "C:/Users/Alex/Repositories/Mensural-Detector/"
-$pathToSourceRoot = "C:/Users/Alex/Repositories/Mensural-Detector/tensorflow_object_detection/"
+$pathToSourceRoot = "C:/Users/Alex/Repositories/Mensural-Detector/object_detection/"
 $pathToTranscript = "$($pathToSourceRoot)"
 
 Start-Transcript -path "$($pathToTranscript)DatasetPreparationTranscript.txt" -append
