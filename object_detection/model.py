@@ -321,7 +321,7 @@ def create_model_fn(detection_model_fn, configs, hparams, use_tpu=False):
                 category_index = label_map_util.create_category_index_from_labelmap(
                     eval_input_config.label_map_path)
             detection_and_groundtruth = vis_utils.draw_side_by_side_evaluation_image(
-                eval_dict, category_index, max_boxes_to_draw=20, min_score_thresh=0.2)
+                eval_dict, category_index, max_boxes_to_draw=600, min_score_thresh=0.2)
             if not use_tpu:
                 tf.summary.image('Detections_Left_Groundtruth_Right',
                                  detection_and_groundtruth)
