@@ -37,6 +37,14 @@ python setup.py install
 
 See also https://github.com/tensorflow/models for additional information
 
+## Install pycocotools
+
+Taken from [here](https://github.com/matterport/Mask_RCNN/issues/6#issuecomment-341503509):
+
+- On Linux, run `pip install git+https://github.com/waleedka/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI`
+
+- On Windows, run `pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI`
+
 ## Append library to python path
 Finally add the [source to the python path](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/installation.md#add-libraries-to-pythonpath).
  
