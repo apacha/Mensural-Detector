@@ -2,3 +2,6 @@ numpy
 opencv-python
 tqdm
 tensorflow
+imblearn
+sklearn
+seaborn

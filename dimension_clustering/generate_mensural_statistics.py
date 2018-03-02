@@ -67,7 +67,7 @@ def create_statistics(dataset_directory: str,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Generates the statistics of the bounding box sizes, needed for dimension clustering')
-    parser.add_argument('-dataset_directory', dest='dataset_directory', type=str, default="db",
+    parser.add_argument('-dataset_directory', dest='dataset_directory', type=str, default="../db",
                         help='Path to the folder containing all images and annotations')
     args = parser.parse_args()
 
