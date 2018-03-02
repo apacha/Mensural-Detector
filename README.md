@@ -131,6 +131,17 @@ train-config: {
 TBD
 
 
+# Dimension clustering
+
+For optimizing the performance of the detector, we adopted the dimensions clustering algorithm, proposed in the [YOLO 9000 paper](https://arxiv.org/abs/1612.08242).
+
+To perform dimension clustering on the cropped images, run the following scripts:
+```
+python generate_mensural_statistics.py
+python mensural_dimension_clustering.py
+```
+The first script will load all annotations and create two csv-files containing the dimensions for each annotation from all images, including their relative sizes, compared to the entire image. The second script loads those statistics and performs dimension clustering, using a k-means algorithm on the relative dimensions of annotations.
+
 # License
 
 Copyright (c) 2018 [Alexander Pacha](http://alexanderpacha.com), [TU Wien](https://www.ims.tuwien.ac.at/people/alexander-pacha) and Jorge Calvo-Zaragoza.
