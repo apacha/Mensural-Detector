@@ -1,5 +1,6 @@
 from typing import List
 
+from models.ResNet4Configuration import ResNet4Configuration
 from models.TrainingConfiguration import TrainingConfiguration
 from models.Vgg4Configuration import Vgg4Configuration
 
@@ -22,7 +23,8 @@ class ConfigurationFactory:
     @staticmethod
     def get_all_configurations(width, height, number_of_classes) -> List[
         TrainingConfiguration]:
-        configurations = [Vgg4Configuration(width, height, number_of_classes), ]
+        configurations = [Vgg4Configuration(width, height, number_of_classes),
+                          ResNet4Configuration(width, height, number_of_classes)]
         return configurations
 
 
