@@ -43,9 +43,9 @@ def get_positions_of_fixed_size_crops(upper_left, lower_right, fixed_width, fixe
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Draws the bounding boxes for all image')
-    parser.add_argument('-dataset_directory', dest='dataset_directory', type=str, default="db",
+    parser.add_argument('-dataset_directory', dest='dataset_directory', type=str, default="../db",
                         help='Path to the folder containing all images and annotations')
-    parser.add_argument('-output_directory', dest='output_directory', type=str, default="classification",
+    parser.add_argument('-output_directory', dest='output_directory', type=str, default="data",
                         help='Path to the folder where the images should be placed, containing one sub-folder per class')
     args = parser.parse_args()
 
