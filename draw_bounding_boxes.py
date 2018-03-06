@@ -9,7 +9,7 @@ def draw_bounding_boxes_into_image(image_path: str, ground_truth_annotations_pat
     with open(ground_truth_annotations_path, 'r') as gt_file:
         lines = gt_file.read().splitlines()
 
-    for line in lines:
+    for index, line in enumerate(lines):
         upper_left, lower_right, gt_shape, gt_position = line.split(';')
 
         x1, y1 = upper_left.split(',')
@@ -22,7 +22,7 @@ def draw_bounding_boxes_into_image(image_path: str, ground_truth_annotations_pat
         y2 = int(float(y2))
 
         cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 0), 3)
-        cv2.putText(img, gt_shape + '/' + gt_position, (x1, y1), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 0), 1)
+        cv2.putText(img, gt_shape + '/' + gt_position + '/' + str(index + 1), (x1, y1), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 0), 1)
 
     cv2.imwrite(destination_path, img)
 
