@@ -71,12 +71,12 @@ Inside the PyCharm, make sure that the project structure is correctly set up and
 For preparing the dataset and transforming it into the right format used for the training, run the following commands, or use the `PrepareDatasetsForTensorflow.ps1` convenience script. 
 
 ```commandline
-python generate_mapping.py
-python annotation_generator.py
-python dataset_splitter.py
+python [GIT_ROOT]/object_detection/generate_mapping.py
+python [GIT_ROOT]/object_detection/annotation_generator.py
+python [GIT_ROOT]/object_detection/dataset_splitter.py
 
-python create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=training 		--annotations_dir=annotations 	--output_path=..\training.record 			--label_map_path=mapping.txt
-python create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=validation 	--annotations_dir=annotations 	--output_path=..\validation.record 		--label_map_path=mapping.txt
+python [GIT_ROOT]/object_detection/create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=training 		--annotations_dir=annotations 	--output_path=..\training.record 			--label_map_path=mapping.txt
+python [GIT_ROOT]/object_detection/create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=validation 	--annotations_dir=annotations 	--output_path=..\validation.record 		--label_map_path=mapping.txt
 ```
 
 
@@ -137,8 +137,8 @@ For optimizing the performance of the detector, we adopted the dimensions cluste
 
 To perform dimension clustering on the cropped images, run the following scripts:
 ```
-python generate_mensural_statistics.py
-python mensural_dimension_clustering.py
+python [GIT_ROOT]/dimension_clustering/generate_mensural_statistics.py
+python [GIT_ROOT]/dimension_clustering/mensural_dimension_clustering.py
 ```
 The first script will load all annotations and create two csv-files containing the dimensions for each annotation from all images, including their relative sizes, compared to the entire image. The second script loads those statistics and performs dimension clustering, using a k-means algorithm on the relative dimensions of annotations.
 
