@@ -70,17 +70,20 @@ if __name__ == "__main__":
 
         top_offset = bottom_offset = 160  # We add 160px at the top and the bottom to include the staff-lines that are required to determine the position
         fixed_width, fixed_height = 128, 448
-        annotation_index_inside_file = 1
-        for line in lines:
-            upper_left, lower_right, gt_shape, gt_position = line.split(';')
+
+        for index, line in enumerate(lines):
+            upper_left, lower_right, class_name, staff_position = line.split(';')
+            # Use this line to classify by object class
+            # classification_parameter = class_name
+            # Use this line to classify by staff position
+            classification_parameter = staff_position
 
             # x1, y1, x2, y2 = get_positions_of_crops_with_additional_vertical_information(upper_left, lower_right, top_offset, bottom_offset, image_width, image_height)
             x1, y1, x2, y2 = get_positions_of_fixed_size_crops(upper_left, lower_right, fixed_width, fixed_height,
                                                                image_width, image_height)
 
             sub_image = img[y1:y2, x1:x2]
-            filename = "{0}-{1}.png".format(pair[0], annotation_index_inside_file)
-            output_filename_path = os.path.join(output_directory, gt_position, filename)
-            os.makedirs(os.path.join(output_directory, gt_position), exist_ok=True)
+            filename = "{0}-{1}.png".format(pair[0], index + 1)
+            output_filename_path = os.path.join(output_directory, classification_parameter, filename)
+            os.makedirs(os.path.join(output_directory, classification_parameter), exist_ok=True)
             cv2.imwrite(output_filename_path, sub_image)
-            annotation_index_inside_file += 1
