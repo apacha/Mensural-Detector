@@ -20,7 +20,7 @@ class ClassWeightCalculator:
 
         :param class_indices: The dictionary, that contains the mapping of class names to index from the data_generator
         :param image_dataset_directory:
-        :param method: string constant, either None, "skBalanced" or "simple"
+        :param method: string constant, either None, "skBalance" or "simple"
         :return:
         """
 
