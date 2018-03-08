@@ -27,7 +27,7 @@ First, make sure you have [protocol buffers](https://developers.google.com/proto
 Now build the required libraries:
 
 ```commandline
-cd Mensural-Detector
+cd [GIT_ROOT]
 protoc object_detection/protos/*.proto --python_out=.
 cd slim
 python setup.py install
@@ -58,7 +58,7 @@ export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 For Windows (in Powershell):
 
 ``` powershell
-$pathToGitRoot = "C:/[YourPathTo]/[Mensural-Detector]"
+$pathToGitRoot = "[GIT_ROOT]"
 $pathToSourceRoot = "$($pathToGitRoot)/object_detection"
 $env:PYTHONPATH = "$($pathToGitRoot);$($pathToSourceRoot);$($pathToGitRoot)/slim"
 ```
@@ -71,12 +71,13 @@ Inside the PyCharm, make sure that the project structure is correctly set up and
 For preparing the dataset and transforming it into the right format used for the training, run the following commands, or use the `PrepareDatasetsForTensorflow.ps1` convenience script. 
 
 ```commandline
-python [GIT_ROOT]/object_detection/generate_mapping.py
-python [GIT_ROOT]/object_detection/annotation_generator.py
-python [GIT_ROOT]/object_detection/dataset_splitter.py
+cd [GIT_ROOT]/object_detection
+python generate_mapping.py
+python annotation_generator.py
+python dataset_splitter.py
 
-python [GIT_ROOT]/object_detection/create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=training 		--annotations_dir=annotations 	--output_path=..\training.record 			--label_map_path=mapping.txt
-python [GIT_ROOT]/object_detection/create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=validation 	--annotations_dir=annotations 	--output_path=..\validation.record 		--label_map_path=mapping.txt
+python create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=training 		--annotations_dir=annotations 	--output_path=..\training.record 			--label_map_path=mapping.txt
+python create_tensorflow_record.py --data_dir=..\training_validation_test  	--set=validation 	--annotations_dir=annotations 	--output_path=..\validation.record 		--label_map_path=mapping.txt
 ```
 
 
@@ -96,11 +97,12 @@ For running the training, you need to change the paths, according to your system
 Run the actual training script, by using the pre-defined Powershell scripts in the `training_scripts` folder, or by directly calling
 
 ```
+cd [GIT_ROOT]/object_detection
 # Start the training
-python [GIT_ROOT]/object_detection/train.py --logtostderr --pipeline_config_path="[GIT_ROOT]/object_detection/configurations/[SELECTED_CONFIG].config" --train_dir="[GIT_ROOT]/object_detection/data/checkpoints-[SELECTED_CONFIG]-train"
+python train.py --logtostderr --pipeline_config_path="[GIT_ROOT]/object_detection/configurations/[SELECTED_CONFIG].config" --train_dir="[GIT_ROOT]/object_detection/data/checkpoints-[SELECTED_CONFIG]-train"
 
 # Start the validation
-python [GIT_ROOT]/object_detection/eval.py --logtostderr --pipeline_config_path="[GIT_ROOT]/object_detection/configurations/[SELECTED_CONFIG].config" --checkpoint_dir="[GIT_ROOT]/object_detection/data/checkpoints-[SELECTED_CONFIG]-train" --eval_dir="[GIT_ROOT]/object_detection/data/checkpoints-[SELECTED_CONFIG]-validate"
+python eval.py --logtostderr --pipeline_config_path="[GIT_ROOT]/object_detection/configurations/[SELECTED_CONFIG].config" --checkpoint_dir="[GIT_ROOT]/object_detection/data/checkpoints-[SELECTED_CONFIG]-train" --eval_dir="[GIT_ROOT]/object_detection/data/checkpoints-[SELECTED_CONFIG]-validate"
 ```
 
 A few remarks: The two scripts can and should be run at the same time, to get a live evaluation during the training. The values, may be visualized by calling `tensorboard --logdir=[GIT_ROOT]/object_detection/data`.
