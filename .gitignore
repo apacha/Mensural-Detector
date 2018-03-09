@@ -15,3 +15,5 @@ data
 BUILD
 anchors-*.png
 /dimension_clustering_protocol.txt
+/frozen_inference_graph.pb
+*.h5
