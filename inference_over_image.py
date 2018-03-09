@@ -10,37 +10,37 @@ if tf.__version__ < '1.4.0':
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Performs detection over input image given a trained detector.')
-    parser.add_argument('-inference_graph', dest='inference_graph', type=str, required=True,
-                        help='Path to the stored inference graph.')
-    parser.add_argument('-label_map', dest='label_map', type=str, required=True, help='Path to the label map.')
-    parser.add_argument('-input', dest='input', type=str, required=True, help='Path to the input image.')
-    parser.add_argument('-num_classes', dest='num_classes', type=int, default=32, help='Number of classes.')
-    parser.add_argument('-output', dest='output', type=str, default='detection.jpg', help='Path to the output image.')
+    parser.add_argument('--inference_graph', dest='inference_graph', type=str, required=True,
+                        help='Path to the frozen inference graph.')
+    parser.add_argument('--label_map', dest='label_map', type=str, required=True,
+                        help='Path to the label map, which is json-file that maps each category name to a unique number.',
+                        default="./object_detection/mapping.txt")
+    parser.add_argument('--input_image', dest='input_image', type=str, required=True, help='Path to the input image.')
+    parser.add_argument('--number_of_classes', dest='number_of_classes', type=int, default=32,
+                        help='Number of classes.')
+    parser.add_argument('--output', dest='output', type=str, default='detection.jpg', help='Path to the output image.')
     args = parser.parse_args()
 
     # Path to frozen detection graph. This is the actual model that is used for the object detection.
     # PATH_TO_CKPT = '/home/jcalvo/Escritorio/Current/Mensural Detector/mensural-detector/output_inference_graph.pb/frozen_inference_graph.pb'
-    PATH_TO_CKPT = args.inference_graph
-
-    # List of the strings that is used to add correct label for each box.
-    # PATH_TO_LABELS = os.path.join('./object_detection/', 'mapping.txt')
-    PATH_TO_LABELS = args.label_map
-
-    # NUM_CLASSES = 90
-    NUM_CLASSES = args.num_classes
+    path_to_checkpoint = args.inference_graph
+    path_to_labels = args.label_map
+    number_of_classes = args.number_of_classes
+    input_image_path = args.input_image
 
     # Read frozen graph
     detection_graph = tf.Graph()
     with detection_graph.as_default():
         od_graph_def = tf.GraphDef()
-        with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
+        with tf.gfile.GFile(path_to_checkpoint, 'rb') as fid:
             serialized_graph = fid.read()
             od_graph_def.ParseFromString(serialized_graph)
             tf.import_graph_def(od_graph_def, name='')
 
-            # Load label map
-    label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
-    categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES,
+    # Load label map
+    label_map = label_map_util.load_labelmap(path_to_labels)
+    categories = label_map_util.convert_label_map_to_categories(label_map,
+                                                                max_num_classes=number_of_classes,
                                                                 use_display_name=True)
     category_index = label_map_util.create_category_index(categories)
 
@@ -84,8 +84,7 @@ if __name__ == "__main__":
                 image_tensor = tf.get_default_graph().get_tensor_by_name('image_tensor:0')
 
                 # Run inference
-                output_dict = sess.run(tensor_dict,
-                                       feed_dict={image_tensor: np.expand_dims(image, 0)})
+                output_dict = sess.run(tensor_dict, feed_dict={image_tensor: np.expand_dims(image, 0)})
 
                 # all outputs are float32 numpy arrays, so convert types as appropriate
                 output_dict['num_detections'] = int(output_dict['num_detections'][0])
@@ -99,9 +98,7 @@ if __name__ == "__main__":
                 return output_dict
 
 
-    image_path = args.input
-
-    image = Image.open(image_path)
+    image = Image.open(input_image_path)
 
     # the array based representation of the image will be used later in order to prepare the
     # result image with boxes and labels on it.
