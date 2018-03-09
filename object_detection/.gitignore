@@ -1,3 +1,4 @@
 /object_detection.egg-info/
 /dist/
 /build/
+/frozen_inference_graph.pb
