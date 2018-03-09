@@ -1,12 +1,13 @@
-$pathToGitRoot = "C:/Users/Alex/Repositories/Mensural-Detector/"
-$pathToSourceRoot = "C:/Users/Alex/Repositories/Mensural-Detector/object_detection/"
-$pathToTranscript = "$($pathToSourceRoot)"
-
-Start-Transcript -path "$($pathToTranscript)DatasetPreparationTranscript.txt" -append
-
+$pathToGitRoot = "C:/Users/Alex/Repositories/Mensural-Detector"
+$pathToSourceRoot = "$($pathToGitRoot)/object_detection"
+$pathToTranscript = "$($pathToSourceRoot)/transcripts"
 cd $pathToSourceRoot
-echo "Appending research folder $($pathToSourceRoot) to temporary PYTHONPATH"
-$env:PYTHONPATH = $env:PYTHONPATH;"$($pathToSourceRoot)"
+
+Start-Transcript -path "$($pathToTranscript)/DatasetPreparationTranscript.txt" -append
+
+# Make sure that python finds all modules inside this directory
+echo "Appending required paths to temporary PYTHONPATH"
+$env:PYTHONPATH = "$($pathToGitRoot);$($pathToSourceRoot);$($pathToGitRoot)/slim"
 
 echo "Testing correct setup"
 python builders/model_builder_test.py
