@@ -26,8 +26,8 @@ First, make sure you have [protocol buffers](https://developers.google.com/proto
  
 Now build the required libraries:
 
-```commandline
-cd [GIT_ROOT]
+```bash
+# From [GIT_ROOT]
 protoc object_detection/protos/*.proto --python_out=.
 cd slim
 python setup.py install
@@ -50,14 +50,14 @@ Finally add the [source to the python path](https://github.com/tensorflow/models
  
 For Unix, it should be something like
 
-``` bash
+```bash
 # From tensorflow/models/research/
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 ```
 
 For Windows (in Powershell):
 
-``` powershell
+```powershell
 $pathToGitRoot = "[GIT_ROOT]"
 $pathToSourceRoot = "$($pathToGitRoot)/object_detection"
 $env:PYTHONPATH = "$($pathToGitRoot);$($pathToSourceRoot);$($pathToGitRoot)/slim"
@@ -70,8 +70,8 @@ Inside the PyCharm, make sure that the project structure is correctly set up and
 # Prepare the dataset
 For preparing the dataset and transforming it into the right format used for the training, run the following commands, or use the `PrepareDatasetsForTensorflow.ps1` convenience script. 
 
-```commandline
-cd [GIT_ROOT]/object_detection
+```bash
+# From [GIT_ROOT]/object_detection
 python generate_mapping.py
 python annotation_generator.py
 python dataset_splitter.py
@@ -96,8 +96,8 @@ For running the training, you need to change the paths, according to your system
 
 Run the actual training script, by using the pre-defined Powershell scripts in the `training_scripts` folder, or by directly calling
 
-```
-cd [GIT_ROOT]/object_detection
+```bash
+# From [GIT_ROOT]/object_detection
 # Start the training
 python train.py --logtostderr --pipeline_config_path="[GIT_ROOT]/object_detection/configurations/[SELECTED_CONFIG].config" --train_dir="[GIT_ROOT]/object_detection/data/checkpoints-[SELECTED_CONFIG]-train"
 
@@ -127,22 +127,70 @@ train-config: {
 
 > Note that inside that folder, there is no actual file, called `model.ckpt`, but multiple files called `model.ckpt.[something]`.
 
-
-# Running inference
-
-TBD
-
-
-# Dimension clustering
+## Dimension clustering
 
 For optimizing the performance of the detector, we adopted the dimensions clustering algorithm, proposed in the [YOLO 9000 paper](https://arxiv.org/abs/1612.08242).
 
 To perform dimension clustering on the cropped images, run the following scripts:
-```
-python [GIT_ROOT]/dimension_clustering/generate_mensural_statistics.py
-python [GIT_ROOT]/dimension_clustering/mensural_dimension_clustering.py
+```bash
+# From [GIT_ROOT]/dimension_clustering
+python generate_mensural_statistics.py
+python mensural_dimension_clustering.py
 ```
 The first script will load all annotations and create two csv-files containing the dimensions for each annotation from all images, including their relative sizes, compared to the entire image. The second script loads those statistics and performs dimension clustering, using a k-means algorithm on the relative dimensions of annotations.
+
+# Running inference
+
+Once you have a trained model, you can use the following procedure to detect symbols in a new image:
+
+## Freeze the model
+
+A checkpoint will typically consist of three files:
+
+* model.ckpt-${CHECKPOINT_NUMBER}.data-00000-of-00001,
+* model.ckpt-${CHECKPOINT_NUMBER}.index
+* model.ckpt-${CHECKPOINT_NUMBER}.meta
+
+After you've identified a candidate checkpoint to export, run the following
+command:
+
+```bash
+# From [GIT_ROOT]/object_detection
+python export_inference_graph.py \
+    --input_type image_tensor \
+    --pipeline_config_path ${PIPELINE_CONFIG_PATH} \
+    --trained_checkpoint_prefix ${TRAIN_PATH} \
+    --output_directory output_inference_graph.pb
+```
+
+On Windows, you can run the `object_detection/freeze_model.ps1` script, after 
+
+Afterwards, you should see a folder named `output_inference_graph.pb`, which contains the `frozen_inference_graph.pb`, which will be used in the next step.
+
+## Detect objects
+Perform inference on a single image by running
+
+```bash
+# From [GIT_ROOT]/object_detection
+python inference_over_image.py \
+    --inference_graph ${frozen_inference_graph.pb} \
+    --label_map mapping.txt \
+    --number_of_classes 32 \
+    --input_image ${IMAGE_TO_BE_CLASSIFIED}
+```
+
+or for an entire directory of images by running
+
+```bash
+# From [GIT_ROOT]/object_detection
+python inference_over_directory.py \
+    --inference_graph ${frozen_inference_graph.pb} \ 
+    --label_map mapping.txt \
+    --number_of_classes 32 
+    --input_directory ${DIRECTORY_TO_IMAGES} \
+    --output ${OUTPUT_DIRECTORY}
+```
+
 
 # License
 
