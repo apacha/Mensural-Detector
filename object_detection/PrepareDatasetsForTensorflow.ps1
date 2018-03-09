@@ -5,7 +5,7 @@ $pathToTranscript = "$($pathToSourceRoot)"
 Start-Transcript -path "$($pathToTranscript)DatasetPreparationTranscript.txt" -append
 
 cd $pathToSourceRoot
-echo "Appending research folder $($pathToGitRoot) to temporary PYTHONPATH"
+echo "Appending research folder $($pathToSourceRoot) to temporary PYTHONPATH"
 $env:PYTHONPATH = $env:PYTHONPATH;"$($pathToSourceRoot)"
 
 echo "Testing correct setup"
