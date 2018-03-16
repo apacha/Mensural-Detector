@@ -13,9 +13,15 @@ $env:PYTHONPATH = "$($pathToGitRoot);$($pathToSourceRoot);$($pathToGitRoot)/slim
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale"
+# $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale_0.001_lr"
+# $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale_0.01_lr"
+# $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale_0.003_lr_20000_decay"
+# $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale_adam"
+$configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale_focal_loss"
+##$configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_20x29-box-size"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_dim_clust"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_dim_clust2"
-$configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_dim_clust3"
+# $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_dim_clust3"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_pretrained"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_1200_proposals"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_1200_proposals_max_suppr_09"
@@ -29,6 +35,6 @@ $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_dim_clust
 Start-Transcript -path "$($pathToTranscript)/ValidateModel-$($configuration).txt" -append
 echo "Validate with $($configuration) configuration"
 python eval.py --logtostderr --pipeline_config_path="$($pathToSourceRoot)/configurations/$($configuration).config" --checkpoint_dir="$($pathToSourceRoot)/data/checkpoints-$($configuration)-train" --eval_dir="$($pathToSourceRoot)/data/checkpoints-$($configuration)-validate"
-# python eval.py --logtostderr --pipeline_config_path="$($pathToSourceRoot)/configurations/$($configuration).config" --checkpoint_dir="$($pathToSourceRoot)/data/checkpoints-$($configuration)-train" --eval_dir="$($pathToSourceRoot)/data/checkpoints-$($configuration)-validate-weighted"
+#python eval.py --logtostderr --pipeline_config_path="$($pathToSourceRoot)/configurations/$($configuration).config" --checkpoint_dir="$($pathToSourceRoot)/data/checkpoints-$($configuration)-train" --eval_dir="$($pathToSourceRoot)/data/checkpoints-$($configuration)-validate-weighted"
 Stop-Transcript
 
