@@ -2,3 +2,4 @@
 /dist/
 /build/
 /frozen_inference_graph.pb
+mapping.txt
