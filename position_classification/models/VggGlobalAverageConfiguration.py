@@ -1,6 +1,7 @@
 from typing import Tuple
 
-from keras.layers import Activation, AveragePooling2D, BatchNormalization, Convolution2D, Dense, Flatten, MaxPooling2D
+from keras.layers import Activation, AveragePooling2D, BatchNormalization, Convolution2D, MaxPooling2D, \
+    GlobalAveragePooling2D
 from keras.models import Sequential
 from keras.regularizers import l2
 from keras.utils import plot_model
@@ -8,7 +9,7 @@ from keras.utils import plot_model
 from position_classification.models.TrainingConfiguration import TrainingConfiguration
 
 
-class Vgg4Configuration(TrainingConfiguration):
+class VggGlobalAverageConfiguration(TrainingConfiguration):
     """ The winning VGG-Net 4 configuration from Deep Learning course """
 
     def __init__(self, width: int, height: int, number_of_classes: int):
@@ -41,9 +42,9 @@ class Vgg4Configuration(TrainingConfiguration):
         self.add_convolution(model, 512, 3, self.weight_decay)
         model.add(AveragePooling2D())
 
-        model.add(Flatten())  # Flatten
-        model.add(Dense(units=self.number_of_classes, kernel_regularizer=l2(self.weight_decay), activation='softmax',
-                        name='output_class'))
+        model.add(Convolution2D(self.number_of_classes, kernel_size=(1, 1), padding='same'))
+        model.add(GlobalAveragePooling2D())
+        model.add(Activation('softmax', name='output_class'))
 
         model.compile(self.get_optimizer(), loss="categorical_crossentropy", metrics=["accuracy"])
         return model
@@ -62,11 +63,11 @@ class Vgg4Configuration(TrainingConfiguration):
 
     def name(self) -> str:
         """ Returns the name of this configuration """
-        return "vgg4"
+        return "vgg_global_average"
 
 
 if __name__ == "__main__":
-    configuration = Vgg4Configuration(96, 96, 32)
+    configuration = VggGlobalAverageConfiguration(96, 96, 32)
     configuration.classifier().summary()
-    plot_model(configuration.classifier(), to_file="vgg4.png")
+    plot_model(configuration.classifier(), to_file="vgg_global_average.png")
     print(configuration.summary())

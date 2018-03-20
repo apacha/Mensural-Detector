@@ -1,8 +1,10 @@
 from typing import List
 
-from models.ResNet4Configuration import ResNet4Configuration
-from models.TrainingConfiguration import TrainingConfiguration
-from models.Vgg4Configuration import Vgg4Configuration
+from position_classification.models.InceptionResNetV2Configuration import InceptionResNetV2Configuration
+from position_classification.models.ResNet4Configuration import ResNet4Configuration
+from position_classification.models.TrainingConfiguration import TrainingConfiguration
+from position_classification.models.Vgg4Configuration import Vgg4Configuration
+from position_classification.models.VggGlobalAverageConfiguration import VggGlobalAverageConfiguration
 
 
 class ConfigurationFactory:
@@ -24,6 +26,8 @@ class ConfigurationFactory:
     def get_all_configurations(width, height, number_of_classes) -> List[
         TrainingConfiguration]:
         configurations = [Vgg4Configuration(width, height, number_of_classes),
+                          VggGlobalAverageConfiguration(width, height, number_of_classes),
+                          InceptionResNetV2Configuration(width, height, number_of_classes),
                           ResNet4Configuration(width, height, number_of_classes)]
         return configurations
 

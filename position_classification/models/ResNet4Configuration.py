@@ -6,7 +6,7 @@ from keras.models import Sequential
 from keras.regularizers import l2
 from keras.utils import plot_model
 
-from models.TrainingConfiguration import TrainingConfiguration
+from position_classification.models.TrainingConfiguration import TrainingConfiguration
 
 
 class ResNet4Configuration(TrainingConfiguration):
@@ -86,9 +86,6 @@ class ResNet4Configuration(TrainingConfiguration):
     def name(self) -> str:
         """ Returns the name of this configuration """
         return "res_net_4"
-
-    def performs_localization(self) -> bool:
-        return False
 
 
 if __name__ == "__main__":
