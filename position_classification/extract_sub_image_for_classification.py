@@ -38,15 +38,20 @@ if __name__ == "__main__":
     parser.add_argument("--group_by", dest="group_by", type=str, default="staff_position",
                         help="Determines how to group the extracted sub-images. "
                              "Can be either 'staff_position' or 'class_name'.")
-    parser.add_argument("--ignore_classes_without_semantic_staff_position", dest="ignore_classes_without_semantic_staff_position",
+    parser.add_argument("--ignore_classes_without_semantic_staff_position",
+                        dest="ignore_classes_without_semantic_staff_position",
                         action='store_true',
                         help="Whether to ignore classes such as proportio maior or barline, that do not have a "
                              "semantic staff line position.")
+    parser.add_argument("--width", default=160, type=int, help="Width of the extracted sub-image")
+    parser.add_argument("--height", default=448, type=int, help="Height of the extracted sub-image")
     args = parser.parse_args()
 
     dataset_directory = args.dataset_directory
     output_directory = args.output_directory
     group_by = args.group_by
+    fixed_width = args.width
+    fixed_height = args.height
     ignore_classes_without_semantic_staff_position = args.ignore_classes_without_semantic_staff_position
     if group_by not in ["staff_position", "class_name"]:
         raise Exception("Group-By parameter must be either 'staff_position' or 'class_name'")
@@ -78,7 +83,6 @@ if __name__ == "__main__":
             lines = gt_file.read().splitlines()
 
         top_offset = bottom_offset = 160  # We add 160px at the top and the bottom to include the staff-lines that are required to determine the position
-        fixed_width, fixed_height = 128, 448
 
         for index, line in enumerate(lines):
             upper_left, lower_right, class_name, staff_position = line.split(";")
