@@ -82,7 +82,7 @@ def train_model(dataset_directory: str, model_name: str,
     callbacks = [model_checkpoint, early_stop, tensorboard_callback, learning_rate_reduction]
 
     class_weight_calculator = ClassWeightCalculator()
-    balancing_method = "simple"
+    balancing_method = "skBalance"
     class_weights = class_weight_calculator.calculate_class_weights(dataset_directory,
                                                                     method=balancing_method,
                                                                     class_indices=training_data_generator.class_indices)
