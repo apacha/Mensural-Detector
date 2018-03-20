@@ -18,8 +18,10 @@ class InceptionResNetV2Configuration(TrainingConfiguration):
 
     def classifier(self) -> Model:
         """ Returns the model of this configuration """
-        inception_resnet = InceptionResNetV2(include_top=True, weights=None, input_shape=self.data_shape, pooling='avg', classes=self.number_of_classes)
-        return inception_resnet
+        model = InceptionResNetV2(include_top=True, weights=None, input_shape=self.data_shape, pooling='avg', classes=self.number_of_classes)
+
+        model.compile(self.get_optimizer(), loss="categorical_crossentropy", metrics=["accuracy"])
+        return model
 
     def name(self) -> str:
         """ Returns the name of this configuration """
