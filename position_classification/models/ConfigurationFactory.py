@@ -1,6 +1,8 @@
 from typing import List
 
 from position_classification.models.InceptionResNetV2Configuration import InceptionResNetV2Configuration
+from position_classification.models.InceptionResNetV2PretrainedConfiguration import \
+    InceptionResNetV2PretrainedConfiguration
 from position_classification.models.ResNet4Configuration import ResNet4Configuration
 from position_classification.models.TrainingConfiguration import TrainingConfiguration
 from position_classification.models.Vgg4Configuration import Vgg4Configuration
@@ -28,6 +30,7 @@ class ConfigurationFactory:
         configurations = [Vgg4Configuration(width, height, number_of_classes),
                           VggGlobalAverageConfiguration(width, height, number_of_classes),
                           InceptionResNetV2Configuration(width, height, number_of_classes),
+                          InceptionResNetV2PretrainedConfiguration(width, height, number_of_classes),
                           ResNet4Configuration(width, height, number_of_classes)]
         return configurations
 
