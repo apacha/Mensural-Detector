@@ -30,7 +30,7 @@ class Vgg16PretrainedConfiguration(TrainingConfiguration):
 
 
 if __name__ == "__main__":
-    configuration = Vgg16PretrainedConfiguration(448, 200, 32)
+    configuration = Vgg16PretrainedConfiguration(448, 160, 32)
     classifier = configuration.classifier()
     classifier.summary()
     plot_model(classifier, to_file="vgg16.png")
