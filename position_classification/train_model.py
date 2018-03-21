@@ -8,11 +8,12 @@ import numpy
 import numpy as np
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
 from keras.preprocessing.image import ImageDataGenerator, DirectoryIterator
-from reporting import sklearn_reporting
-from reporting.TrainingHistoryPlotter import TrainingHistoryPlotter
+from position_classification.reporting import sklearn_reporting
+from position_classification.reporting.TrainingHistoryPlotter import TrainingHistoryPlotter
 
-from ClassWeightCalculator import ClassWeightCalculator
-from models.ConfigurationFactory import ConfigurationFactory
+from position_classification.ClassWeightCalculator import ClassWeightCalculator
+from position_classification.models.ConfigurationFactory import ConfigurationFactory
+import tensorflow as tf
 
 
 def train_model(dataset_directory: str, model_name: str,
@@ -175,6 +176,10 @@ if __name__ == "__main__":
                         help="Height of the input-images for the network in pixel")
 
     flags, unparsed = parser.parse_known_args()
+
+    # Use these lines to restrict execution to only use 40% of the GPU's RAM
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
+    sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
     train_model(dataset_directory=flags.dataset_directory,
                 model_name=flags.model_name,
