@@ -28,12 +28,12 @@ $models += "vgg16"
 
 foreach ($model in $models) {
 	# Run a training per selected model
-	$transcript_path = "$($pathToTranscript)\2018-03-21_$($model_name)_$($width)x$($height).txt"
+	$transcript_path = "$($pathToTranscript)\2018-03-21_$($model)_$($width)x$($height).txt"
 
 	Start-Transcript -path $transcript_path -append
 	Remove-Item -Recurse -Force $dataset_directory
 	python extract_sub_image_for_classification.py --output_directory $dataset_directory --width $width --height $height --group_by $group_by
 	python dataset_splitter.py --source_directory $dataset_directory --destination_directory $dataset_directory
-	python "$($pathToSourceRoot)\train_model.py" --dataset_directory $dataset_directory --model_name $model_name --width $width --height $height
+	python "$($pathToSourceRoot)\train_model.py" --dataset_directory $dataset_directory --model_name $model --width $width --height $height
 	Stop-Transcript
 }
