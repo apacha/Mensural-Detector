@@ -17,7 +17,7 @@ import tensorflow as tf
 
 
 def train_model(dataset_directory: str, model_name: str,
-                width: int, height: int):
+                width: int, height: int, output_name: str = None):
     print("Loading configuration and data-readers...")
     start_time = time()
 
@@ -63,7 +63,10 @@ def train_model(dataset_directory: str, model_name: str,
     print(training_configuration.summary())
 
     start_of_training = datetime.date.today()
-    best_model_path = "{0}_{1}.h5".format(start_of_training, training_configuration.name())
+    if output_name is None:
+        best_model_path = "{0}_{1}.h5".format(start_of_training, training_configuration.name())
+    else:
+        best_model_path = "{0}.h5".format(output_name)
 
     monitor_variable = 'val_acc'
 
@@ -76,8 +79,13 @@ def train_model(dataset_directory: str, model_name: str,
                                                 verbose=1,
                                                 factor=training_configuration.learning_rate_reduction_factor,
                                                 min_lr=training_configuration.minimum_learning_rate)
+    if output_name is None:
+        log_directory = "./logs/{0}_{1}/".format(start_of_training, training_configuration.name())
+    else:
+        log_directory = "./logs/{0}/".format(output_name)
+
     tensorboard_callback = TensorBoard(
-        log_dir="./logs/{0}_{1}/".format(start_of_training, training_configuration.name()),
+        log_dir=log_directory,
         batch_size=training_configuration.training_minibatch_size)
 
     callbacks = [model_checkpoint, early_stop, tensorboard_callback, learning_rate_reduction]
@@ -171,6 +179,8 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="vgg4",
                         help="The model used for training the network. Run ListAvailableConfigurations.ps1 or "
                              "models/ConfigurationFactory.py to get a list of all available configurations")
+    parser.add_argument("--output_name", type=str, default=None, required=False,
+                        help="An optional name of the output file, that should be used. If non specified, an automatic name will be assigned with the timestamp and selected model.")
     parser.add_argument("--width", default=128, type=int, help="Width of the input-images for the network in pixel")
     parser.add_argument("--height", default=448, type=int,
                         help="Height of the input-images for the network in pixel")
@@ -184,4 +194,5 @@ if __name__ == "__main__":
     train_model(dataset_directory=flags.dataset_directory,
                 model_name=flags.model_name,
                 width=flags.width,
-                height=flags.height)
+                height=flags.height,
+                output_name=flags.output_name)
