@@ -15,7 +15,6 @@ def get_positions_of_fixed_size_crops(upper_left, lower_right, fixed_width, fixe
     """
     left, top = upper_left.split(",")
     right, bottom = lower_right.split(",")
-    # String to float, float to int
     left, right, top, bottom = float(left), float(right), float(top), float(bottom)
 
     center_x = left + (right - left) / 2
@@ -66,12 +65,6 @@ if __name__ == "__main__":
     ignorable_classes = ["proportio_maior", "proportio_minor", "barline", "double_barline", "undefined", "sharp",
                          "ligature", "fermata", "beam", "dot", "cut_time", "common_time"]
 
-    all_classes = ["ligature", "coloured_semibrevis", "coloured_brevis", "flat", "f_clef_1", "longa", "proportio_maior",
-                   "semiminima_rest", "f_clef_2", "g_clef", "semibrevis", "longa_rest", "proportio_minor", "minima",
-                   "coloured_minima", "coloured_semiminima", "brevis_rest", "undefined", "brevis", "barline",
-                   "cut_time", "c_clef", "fermata", "beam", "minima_rest", "semibrevis_rest", "sharp", "common_time",
-                   "dot", "custos", "semiminima", "double_barline"]
-
     for pair in tqdm(pairs, desc="Extracting sub-images for each annotated symbol", total=len(images)):
         image_path = os.path.join(dataset_directory, pair[0])
         img = cv2.imread(image_path, True)
@@ -81,8 +74,6 @@ if __name__ == "__main__":
 
         with open(annotations_path, "r") as gt_file:
             lines = gt_file.read().splitlines()
-
-        top_offset = bottom_offset = 160  # We add 160px at the top and the bottom to include the staff-lines that are required to determine the position
 
         for index, line in enumerate(lines):
             upper_left, lower_right, class_name, staff_position = line.split(";")
