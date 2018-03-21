@@ -5,4 +5,4 @@ tensorflow
 imblearn
 sklearn
 seaborn
-keras
+keras>=2.1.3
