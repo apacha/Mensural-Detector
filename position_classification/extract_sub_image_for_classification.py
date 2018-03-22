@@ -2,6 +2,7 @@ import argparse
 
 import os
 from cv2 import cv2
+import numpy as np
 
 from tqdm import tqdm
 
@@ -25,6 +26,27 @@ def get_positions_of_fixed_size_crops(upper_left, lower_right, fixed_width, fixe
     new_bottom = min(image_height, center_y + fixed_height / 2)
 
     return int(new_left), int(new_top), int(new_right), int(new_bottom)
+    
+
+def compute_pad_to_force_center(upper_left, lower_right, fixed_width, fixed_height, image_width,
+                                      image_height) -> (int, int, int, int):
+    """
+        Returns the necessary padding to force the symbol to be in the center of the image sample.
+        This is useful when the symbol is close to the image boundaries, and so the usual procedure
+        do not find the symbol exactly in the center of the cropped image.
+    """
+    left, top = upper_left.split(",")
+    right, bottom = lower_right.split(",")
+    left, right, top, bottom = float(left), float(right), float(top), float(bottom)
+
+    center_x = left + (right - left) / 2
+    center_y = top + (bottom - top) / 2
+    pad_left = abs( min(0, center_x - fixed_width / 2) )
+    pad_right = abs( min(0, image_width - center_x + fixed_width / 2) )
+    pad_top = abs( min(0, center_y - fixed_height / 2) )
+    pad_bottom = abs( min(0, image_height - center_y + fixed_height / 2) )
+
+    return int(pad_left), int(pad_right), int(pad_top), int(pad_bottom)
 
 
 if __name__ == "__main__":
@@ -42,6 +64,11 @@ if __name__ == "__main__":
                         action='store_true',
                         help="Whether to ignore classes such as proportio maior or barline, that do not have a "
                              "semantic staff line position.")
+    parser.add_argument("--add_padding_to_force_center",
+                        dest="add_padding_to_force_center",
+                        action='store_true',
+                        help="Whether to add padding to force the symbol to be in the center of the cropped images."
+                             "This is useful when the symbol is close to image boundaries.")
     parser.add_argument("--width", default=160, type=int, help="Width of the extracted sub-image")
     parser.add_argument("--height", default=448, type=int, help="Height of the extracted sub-image")
     args = parser.parse_args()
@@ -52,6 +79,7 @@ if __name__ == "__main__":
     fixed_width = args.width
     fixed_height = args.height
     ignore_classes_without_semantic_staff_position = args.ignore_classes_without_semantic_staff_position
+    add_padding_to_force_center = args.add_padding_to_force_center
     if group_by not in ["staff_position", "class_name"]:
         raise Exception("Group-By parameter must be either 'staff_position' or 'class_name'")
 
@@ -88,8 +116,18 @@ if __name__ == "__main__":
 
             x1, y1, x2, y2 = get_positions_of_fixed_size_crops(upper_left, lower_right, fixed_width, fixed_height,
                                                                image_width, image_height)
-
             sub_image = img[y1:y2, x1:x2]
+
+            if add_padding_to_force_center:
+                left, right, top, bottom = compute_pad_to_force_center(upper_left, lower_right, fixed_width, fixed_height,
+                                                               image_width, image_height)
+                sub_image = np.stack(
+                            [np.pad(sub_image[:,:,c],
+                                   [(top, bottom), (left, right)],
+                                   mode='constant',
+                                   constant_values=255)
+                             for c in range(3)], axis=2)
+
             filename = "{0}-{1}.png".format(pair[0], index + 1)
             output_filename_path = os.path.join(output_directory, classification_parameter, filename)
             os.makedirs(os.path.join(output_directory, classification_parameter), exist_ok=True)
