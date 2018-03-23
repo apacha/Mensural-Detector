@@ -83,6 +83,9 @@ if __name__ == "__main__":
     if group_by not in ["staff_position", "class_name"]:
         raise Exception("Group-By parameter must be either 'staff_position' or 'class_name'")
 
+    if add_padding_to_force_center:
+        print("Padding images to force objects to appear in the center")
+
     files = os.listdir(dataset_directory)
     images = sorted([file for file in files if file.endswith(".JPG")])
     annotations = sorted([file for file in files if file.endswith(".txt")])
