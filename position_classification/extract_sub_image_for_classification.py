@@ -124,8 +124,7 @@ if __name__ == "__main__":
                 sub_image = np.stack(
                             [np.pad(sub_image[:,:,c],
                                    [(top, bottom), (left, right)],
-                                   mode='constant',
-                                   constant_values=255)
+                                   mode='median')
                              for c in range(3)], axis=2)
 
             filename = "{0}-{1}.png".format(pair[0], index + 1)
