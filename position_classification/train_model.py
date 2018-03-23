@@ -188,8 +188,8 @@ if __name__ == "__main__":
     flags, unparsed = parser.parse_known_args()
 
     # Use these lines to restrict execution to only use 40% of the GPU's RAM
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
-    sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+    #gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
+    #sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
     train_model(dataset_directory=flags.dataset_directory,
                 model_name=flags.model_name,
