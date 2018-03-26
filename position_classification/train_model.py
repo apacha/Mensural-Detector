@@ -176,20 +176,19 @@ if __name__ == "__main__":
     parser.register("type", "bool", lambda v: v.lower() == "true")
     parser.add_argument("--dataset_directory", type=str, default="data",
                         help="The directory, that is used for storing the images during training")
-    parser.add_argument("--model_name", type=str, default="vgg4",
+    parser.add_argument("--model_name", type=str, default="inception_resnet_v2",
                         help="The model used for training the network. Run ListAvailableConfigurations.ps1 or "
                              "models/ConfigurationFactory.py to get a list of all available configurations")
     parser.add_argument("--output_name", type=str, default=None, required=False,
                         help="An optional name of the output file, that should be used. If non specified, an automatic name will be assigned with the timestamp and selected model.")
-    parser.add_argument("--width", default=128, type=int, help="Width of the input-images for the network in pixel")
-    parser.add_argument("--height", default=448, type=int,
-                        help="Height of the input-images for the network in pixel")
+    parser.add_argument("--width", default=224, type=int, help="Width of the input-images for the network in pixel")
+    parser.add_argument("--height", default=448, type=int, help="Height of the input-images for the network in pixel")
 
     flags, unparsed = parser.parse_known_args()
 
     # Use these lines to restrict execution to only use 40% of the GPU's RAM
-    #gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
-    #sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+    # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
+    # sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
     train_model(dataset_directory=flags.dataset_directory,
                 model_name=flags.model_name,
