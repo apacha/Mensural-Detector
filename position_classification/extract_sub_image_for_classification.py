@@ -42,9 +42,9 @@ def compute_pad_to_force_center(upper_left, lower_right, fixed_width, fixed_heig
     center_x = left + (right - left) / 2
     center_y = top + (bottom - top) / 2
     pad_left = abs( min(0, center_x - fixed_width / 2) )
-    pad_right = abs( min(0, image_width - center_x + fixed_width / 2) )
+    pad_right = abs( min(0, image_width - (center_x + fixed_width / 2)) )
     pad_top = abs( min(0, center_y - fixed_height / 2) )
-    pad_bottom = abs( min(0, image_height - center_y + fixed_height / 2) )
+    pad_bottom = abs( min(0, image_height - (center_y + fixed_height / 2)) )
 
     return int(pad_left), int(pad_right), int(pad_top), int(pad_bottom)
 
@@ -127,7 +127,7 @@ if __name__ == "__main__":
                 sub_image = np.stack(
                             [np.pad(sub_image[:,:,c],
                                    [(top, bottom), (left, right)],
-                                   mode='median')
+                                   mode='symmetric')
                              for c in range(3)], axis=2)
 
             filename = "{0}-{1}.png".format(pair[0], index + 1)
