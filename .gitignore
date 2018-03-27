@@ -18,3 +18,4 @@ anchors-*.png
 /frozen_inference_graph.pb
 *.h5
 detection_output
+/training_test_splits/
