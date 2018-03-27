@@ -14,7 +14,7 @@ mapping_filepath = args.mapping_filepath
 
 annotation_files = glob.glob(os.path.join(dataset_directory, "*.txt"))
 classes = []
-for annotation_file in tqdm(annotation_files):
+for annotation_file in tqdm(annotation_files, desc="Generating mapping"):
     with open(os.path.join(dataset_directory, annotation_file), 'r') as file:
         lines = file.read().splitlines()
 
