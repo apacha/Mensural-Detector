@@ -90,25 +90,26 @@ if __name__ == "__main__":
     parser.add_argument('--label_map', dest='label_map', type=str, required=True,
                         help='Path to the label map, which is json-file that maps each category name to a unique number.',
                         default="mapping.txt")
-    parser.add_argument('--input_image', dest='input_image', type=str, required=True, help='Path to the input image.')
     parser.add_argument('--number_of_classes', dest='number_of_classes', type=int, default=32,
                         help='Number of classes.')
-    parser.add_argument('--output', dest='output', type=str, default='detection.jpg', help='Path to the output image.')
+    parser.add_argument('--input_image', dest='input_image', type=str, required=True, help='Path to the input image.')
+    parser.add_argument('--output_image', dest='output_image', type=str, default='detection.jpg',
+                        help='Path to the output image.')
     args = parser.parse_args()
 
     # Path to frozen detection graph. This is the actual model that is used for the object detection.
     # PATH_TO_CKPT = '/home/jcalvo/Escritorio/Current/Mensural Detector/mensural-detector/output_inference_graph.pb/frozen_inference_graph.pb'
-    path_to_checkpoint = args.inference_graph
+    path_to_frozen_inference_graph = args.inference_graph
     path_to_labels = args.label_map
     number_of_classes = args.number_of_classes
-    input_image_path = args.input_image
-    output_file = args.output
+    input_image = args.input_image
+    output_image = args.output_image
 
     # Read frozen graph
-    detection_graph = load_detection_graph(path_to_checkpoint)
+    detection_graph = load_detection_graph(path_to_frozen_inference_graph)
     category_index = load_category_index(path_to_labels, number_of_classes)
 
-    image = Image.open(input_image_path)
+    image = Image.open(input_image)
 
     # the array based representation of the image will be used later in order to prepare the
     # result image with boxes and labels on it.
@@ -127,4 +128,4 @@ if __name__ == "__main__":
         instance_masks=output_dict.get('detection_masks'),
         use_normalized_coordinates=True,
         line_thickness=2)
-    Image.fromarray(image_np).save(output_file)
+    Image.fromarray(image_np).save(output_image)

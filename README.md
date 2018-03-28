@@ -160,12 +160,12 @@ python export_inference_graph.py \
     --input_type image_tensor \
     --pipeline_config_path ${PIPELINE_CONFIG_PATH} \
     --trained_checkpoint_prefix ${TRAIN_PATH} \
-    --output_directory output_inference_graph.pb
+    --output_directory output_inference_graph
 ```
 
-On Windows, you can run the `object_detection/freeze_model.ps1` script, after 
+On Windows, you can run the `object_detection/freeze_model.ps1` script, after setting the appropriate paths and checkpoint number inside.
 
-Afterwards, you should see a folder named `output_inference_graph.pb`, which contains the `frozen_inference_graph.pb`, which will be used in the next step.
+Afterwards, you should see a folder named `output_inference_graph`, which contains the `frozen_inference_graph.pb`, which will be used in the next step.
 
 ## Detect objects
 Perform inference on a single image by running
@@ -176,7 +176,8 @@ python inference_over_image.py \
     --inference_graph ${frozen_inference_graph.pb} \
     --label_map mapping.txt \
     --number_of_classes 32 \
-    --input_image ${IMAGE_TO_BE_CLASSIFIED}
+    --input_image ${IMAGE_TO_BE_CLASSIFIED} \
+    --output_image image_with_detection.jpg
 ```
 
 or for an entire directory of images by running
@@ -188,7 +189,7 @@ python inference_over_directory.py \
     --label_map mapping.txt \
     --number_of_classes 32 
     --input_directory ${DIRECTORY_TO_IMAGES} \
-    --output ${OUTPUT_DIRECTORY}
+    --output_directory ${OUTPUT_DIRECTORY}
 ```
 
 

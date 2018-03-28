@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 
-import inference_over_image
+import object_detection.inference_over_image as inference_over_image
 from object_detection.utils import ops as utils_ops, label_map_util, visualization_utils as vis_util
 
 if tf.__version__ < '1.4.0':
@@ -42,19 +42,19 @@ if __name__ == "__main__":
                         help='Path to the directory that contains the images for which object detection should be performed')
     parser.add_argument('--number_of_classes', dest='number_of_classes', type=int, default=32,
                         help='Number of classes.')
-    parser.add_argument('--output', dest='output', type=str, default='detection_output',
+    parser.add_argument('--output_directory', dest='output_directory', type=str, default='detection_output',
                         help='Path to the output directory, that will contain the results.')
     args = parser.parse_args()
 
     # Path to frozen detection graph. This is the actual model that is used for the object detection.
-    path_to_checkpoint = args.inference_graph
+    path_to_frozen_inference_graph = args.inference_graph
     path_to_labels = args.label_map
     number_of_classes = args.number_of_classes
     input_image_directory = args.input_directory
-    output_directory = args.output
+    output_directory = args.output_directory
 
     # Read frozen graph
-    detection_graph = inference_over_image.load_detection_graph(path_to_checkpoint)
+    detection_graph = inference_over_image.load_detection_graph(path_to_frozen_inference_graph)
     category_index = inference_over_image.load_category_index(path_to_labels, number_of_classes)
 
     input_files = os.listdir(input_image_directory)
