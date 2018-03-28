@@ -72,19 +72,6 @@ def nms(dets, thresh):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Performs detection over input image given a trained detector.')
-    parser.add_argument('--inference_graph', dest='inference_graph', type=str, required=True,
-                        help='Path to the frozen inference graph.')
-    parser.add_argument('--label_map', dest='label_map', type=str, required=True,
-                        help='Path to the label map, which is json-file that maps each category name to a unique number.',
-                        default="mapping.txt")
-    parser.add_argument('--number_of_classes', dest='number_of_classes', type=int, default=32,
-                        help='Number of classes.')
-    parser.add_argument('--input_image', dest='input_image', type=str, required=True, help='Path to the input image.')
-    parser.add_argument('--output_image', dest='output_image', type=str, default='detection.jpg',
-                        help='Path to the output image.')
-    args = parser.parse_args()
-
     input_image = "object_detection/samples/12673.JPG"  # args.input_image
     output_image = "object_detection/samples/12673_detection_analysis.jpg"  # args.output_image
     annotations_path = "object_detection/samples/12673.JPG.txt"
@@ -114,28 +101,38 @@ if __name__ == "__main__":
         xmin, ymin = upper_left.split(',')
         xmax, ymax = lower_right.split(',')
         gt_classes.append(class_name)
-        gt_boxes.append((float(xmin) / image_width,
-                         float(ymin) / image_height,
-                         float(xmax) / image_width,
-                         float(ymax) / image_height))
+        # gt_boxes.append((float(xmin) / image_width,
+        #                  float(ymin) / image_height,
+        #                  float(xmax) / image_width,
+        #                  float(ymax) / image_height))
+        gt_boxes.append((float(xmin), float(ymin), float(xmax), float(ymax)))
     gt_boxes = np.asarray(gt_boxes, dtype=np.float32)
 
     i = 0
+    pairs = []
+    for gt_box in gt_boxes:
+        for (xmin, ymin, xmax, ymax) in detection_boxes:
+            detection_box = (xmin * image_width,
+                             ymin * image_height,
+                             xmax * image_width,
+                             ymax * image_height)
 
-    for detection_box in detection_boxes:
-        for gt_box in gt_boxes:
             iou = bb_intersection_over_union(detection_box, gt_box)
-            if iou > 0.9:
+            if iou > 0.5:
                 i += 1
+                iou = bb_intersection_over_union(detection_box, gt_box)
+                pairs.append((detection_box, gt_box))
 
-    # # Visualization of the results of a detection.
-    # vis_util.visualize_boxes_and_labels_on_image_array(
-    #     image_np,
-    #     output_dict['detection_boxes'],
-    #     output_dict['detection_classes'],
-    #     output_dict['detection_scores'],
-    #     category_index,
-    #     instance_masks=output_dict.get('detection_masks'),
-    #     use_normalized_coordinates=True,
-    #     line_thickness=2)
-    # Image.fromarray(image_np).save(output_image)
+    print(i)
+
+# # Visualization of the results of a detection.
+# vis_util.visualize_boxes_and_labels_on_image_array(
+#     image_np,
+#     output_dict['detection_boxes'],
+#     output_dict['detection_classes'],
+#     output_dict['detection_scores'],
+#     category_index,
+#     instance_masks=output_dict.get('detection_masks'),
+#     use_normalized_coordinates=True,
+#     line_thickness=2)
+# Image.fromarray(image_np).save(output_image)
