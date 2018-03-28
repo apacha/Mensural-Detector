@@ -625,8 +625,7 @@ class ObjectDetectionEvaluation(object):
             if scores[i].shape[0] > 0:
                 self.scores_per_class[i].append(scores[i])
                 self.tp_fp_labels_per_class[i].append(tp_fp_labels[i])
-        (self.num_images_correctly_detected_per_class
-         ) += is_class_correctly_detected_in_image
+        self.num_images_correctly_detected_per_class += is_class_correctly_detected_in_image
 
     def _update_ground_truth_statistics(self, groundtruth_class_labels,
                                         groundtruth_is_difficult_list,
