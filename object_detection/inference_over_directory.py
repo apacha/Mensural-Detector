@@ -5,6 +5,7 @@ import numpy as np
 
 from PIL import Image
 from tqdm import tqdm
+import pickle
 
 import object_detection.inference_over_image as inference_over_image
 from object_detection.utils import ops as utils_ops, label_map_util, visualization_utils as vis_util
@@ -103,3 +104,7 @@ if __name__ == "__main__":
                 input_file_name, extension = os.path.splitext(os.path.basename(input_file))
                 output_file = os.path.join(output_directory, "{0}_detection{1}".format(input_file_name, extension))
                 Image.fromarray(image_np).save(output_file)
+
+                output_pickle_file = os.path.join(output_directory, "{0}_detection.pickle".format(input_file_name))
+                with open(output_pickle_file, "wb") as pickle_file:
+                    pickle.dump(output_dict, pickle_file)
