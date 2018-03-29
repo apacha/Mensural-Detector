@@ -1,4 +1,5 @@
 import pickle
+from glob import glob
 from typing import Tuple, List
 
 import numpy as np
@@ -45,44 +46,8 @@ def bb_intersection_over_union(boxA, boxB):
     return iou
 
 
-def nms(dets, thresh):
-    x1 = dets[:, 0]
-    y1 = dets[:, 1]
-    x2 = dets[:, 2]
-    y2 = dets[:, 3]
-    scores = dets[:, 4]
-
-    areas = (x2 - x1 + 1) * (y2 - y1 + 1)
-    order = scores.argsort()[::-1]
-
-    keep = []
-    while order.size > 0:
-        i = order[0]
-        keep.append(i)
-        xx1 = np.maximum(x1[i], x1[order[1:]])
-        yy1 = np.maximum(y1[i], y1[order[1:]])
-        xx2 = np.minimum(x2[i], x2[order[1:]])
-        yy2 = np.minimum(y2[i], y2[order[1:]])
-
-        w = np.maximum(0.0, xx2 - xx1 + 1)
-        h = np.maximum(0.0, yy2 - yy1 + 1)
-        inter = w * h
-        ovr = inter / (areas[i] + areas[order[1:]] - inter)
-
-        inds = np.where(ovr <= thresh)[0]
-        order = order[inds + 1]
-
-    return keep
-
-
-if __name__ == "__main__":
-    input_image = "object_detection/samples/12673.JPG"  # args.input_image
-    output_image_template = "object_detection/samples/12673_detection_analysis_{0}.jpg"  # args.output_image
-    annotations_path = "object_detection/samples/12673.JPG.txt"
-    sample_detections = "object_detection/samples/output_dict.pickle"
-    path_to_labels = "object_detection/mapping.txt"
-    number_of_classes = 32
-
+def visualize_evaluation(input_image, output_image, annotations, serialized_detections, path_to_labels,
+                         number_of_classes):
     image = Image.open(input_image)
     image_width, image_height = image.size
 
@@ -93,7 +58,7 @@ if __name__ == "__main__":
     category_to_index = {v["name"]: v["id"] for k, v in category_index.items()}
 
     # Actual detection.
-    with open(sample_detections, "rb") as pickle_file:
+    with open(serialized_detections, "rb") as pickle_file:
         output_dict = pickle.load(pickle_file)
 
     detection_boxes_normalized = output_dict['detection_boxes']
@@ -106,7 +71,7 @@ if __name__ == "__main__":
     detection_scores = output_dict['detection_scores']
     detection_classes = output_dict['detection_classes']
 
-    with open(annotations_path, 'r') as gt_file:
+    with open(annotations, 'r') as gt_file:
         lines = gt_file.read().splitlines()
 
     gt_boxes = []  # type: List[Tuple[float, float, float, float]]
@@ -153,50 +118,43 @@ if __name__ == "__main__":
     print("{0} misclassified detections".format(len(misclassified_detections)))
 
     # Visualization of the results of a detection.
-    cloned_image = image_np.copy()
-    vis_util.visualize_boxes_and_labels_on_image_array(
-        cloned_image, np.asarray(detection_boxes, dtype=np.float32), detection_classes, detection_scores,
-        category_index, instance_masks=None, use_normalized_coordinates=False, line_thickness=2)
-    Image.fromarray(cloned_image).save(output_image_template.format("full_detection"))
-
-    cloned_image = image_np.copy()
     line_thickness = 5
-    vis_util.visualize_boxes_and_labels_on_image_array(cloned_image, np.asarray(gt_boxes, dtype=np.float32), gt_classes,
-                                                       None, category_index, instance_masks=None,
-                                                       use_normalized_coordinates=False, line_thickness=line_thickness)
-    #Image.fromarray(cloned_image).save(output_image_template.format("ground_truth"))
-
     cloned_image = image_np.copy()
     vis_util.visualize_boxes_and_labels_on_image_array(cloned_image, np.asarray(correct_detections, dtype=np.float32),
                                                        None, None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False,
                                                        line_thickness=line_thickness,
                                                        groundtruth_box_visualization_color=(0, 128, 0))
-    #Image.fromarray(cloned_image).save(output_image_template.format("correct_detections"))
-
-    # cloned_image = image_np.copy()
     vis_util.visualize_boxes_and_labels_on_image_array(cloned_image, np.asarray(missed_detections, dtype=np.float32),
                                                        None, None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False,
                                                        line_thickness=line_thickness,
                                                        groundtruth_box_visualization_color=(245, 245, 245))
-    #Image.fromarray(cloned_image).save(output_image_template.format("missed_detections"))
-
-    # cloned_image = image_np.copy()
     vis_util.visualize_boxes_and_labels_on_image_array(cloned_image, np.asarray(incorrect_detections, dtype=np.float32),
                                                        None, None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False,
                                                        line_thickness=line_thickness,
-                                                       groundtruth_box_visualization_color=(255,106,0))
-    #Image.fromarray(cloned_image).save(output_image_template.format("incorrect_detections"))
-
-    # cloned_image = image_np.copy()
+                                                       groundtruth_box_visualization_color=(255, 106, 0))
     vis_util.visualize_boxes_and_labels_on_image_array(cloned_image,
                                                        np.asarray(misclassified_detections, dtype=np.float32),
                                                        None, None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False,
                                                        line_thickness=line_thickness,
-                                                       groundtruth_box_visualization_color=(255,185,0))
-    #Image.fromarray(cloned_image).save(output_image_template.format("misclassified_detections"))
+                                                       groundtruth_box_visualization_color=(255, 185, 0))
+    Image.fromarray(cloned_image).save(output_image)
 
-    Image.fromarray(cloned_image).save(output_image_template.format("all"))
+
+if __name__ == "__main__":
+    input_image = "object_detection/samples/12673.JPG"  # args.input_image
+    output_image = "object_detection/samples/12673_detection_analysis.jpg"  # args.output_image
+    annotations = "object_detection/samples/12673.JPG.txt"
+    serialized_detections = "object_detection/samples/output_dict.pickle"
+    path_to_labels = "object_detection/mapping.txt"
+    number_of_classes = 32
+
+    visualize_evaluation(input_image, output_image, annotations, serialized_detections, path_to_labels,
+                         number_of_classes)
+
+
+    annotations = glob("db/*.txt")
+    input_images = glob("db/*.JPG")
