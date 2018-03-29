@@ -164,31 +164,31 @@ if __name__ == "__main__":
     vis_util.visualize_boxes_and_labels_on_image_array(cloned_image, np.asarray(gt_boxes, dtype=np.float32), gt_classes,
                                                        None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False, line_thickness=line_thickness)
-    Image.fromarray(cloned_image).save(output_image_template.format("ground_truth"))
+    #Image.fromarray(cloned_image).save(output_image_template.format("ground_truth"))
 
     cloned_image = image_np.copy()
     vis_util.visualize_boxes_and_labels_on_image_array(cloned_image, np.asarray(correct_detections, dtype=np.float32),
                                                        None, None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False,
                                                        line_thickness=line_thickness,
-                                                       groundtruth_box_visualization_color=(18, 93, 44))
-    Image.fromarray(cloned_image).save(output_image_template.format("correct_detections"))
+                                                       groundtruth_box_visualization_color=(0, 128, 0))
+    #Image.fromarray(cloned_image).save(output_image_template.format("correct_detections"))
 
     # cloned_image = image_np.copy()
     vis_util.visualize_boxes_and_labels_on_image_array(cloned_image, np.asarray(missed_detections, dtype=np.float32),
                                                        None, None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False,
                                                        line_thickness=line_thickness,
-                                                       groundtruth_box_visualization_color=(236, 240, 241))
-    Image.fromarray(cloned_image).save(output_image_template.format("missed_detections"))
+                                                       groundtruth_box_visualization_color=(245, 245, 245))
+    #Image.fromarray(cloned_image).save(output_image_template.format("missed_detections"))
 
     # cloned_image = image_np.copy()
     vis_util.visualize_boxes_and_labels_on_image_array(cloned_image, np.asarray(incorrect_detections, dtype=np.float32),
                                                        None, None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False,
                                                        line_thickness=line_thickness,
-                                                       groundtruth_box_visualization_color=(218,65,39))
-    Image.fromarray(cloned_image).save(output_image_template.format("incorrect_detections"))
+                                                       groundtruth_box_visualization_color=(255,106,0))
+    #Image.fromarray(cloned_image).save(output_image_template.format("incorrect_detections"))
 
     # cloned_image = image_np.copy()
     vis_util.visualize_boxes_and_labels_on_image_array(cloned_image,
@@ -196,7 +196,7 @@ if __name__ == "__main__":
                                                        None, None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False,
                                                        line_thickness=line_thickness,
-                                                       groundtruth_box_visualization_color=(252,255,147))
-    Image.fromarray(cloned_image).save(output_image_template.format("misclassified_detections"))
+                                                       groundtruth_box_visualization_color=(255,185,0))
+    #Image.fromarray(cloned_image).save(output_image_template.format("misclassified_detections"))
 
     Image.fromarray(cloned_image).save(output_image_template.format("all"))
