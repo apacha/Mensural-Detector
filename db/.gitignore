@@ -1,1 +1,3 @@
 *.csv
+*.pickle
+*_detection_analysis.jpg
