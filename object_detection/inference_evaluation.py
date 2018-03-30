@@ -5,6 +5,7 @@ from typing import Tuple, List
 import numpy as np
 import tensorflow as tf
 from PIL import Image
+from tqdm import tqdm
 
 from object_detection.utils import ops as utils_ops, label_map_util, visualization_utils as vis_util
 
@@ -117,6 +118,14 @@ def visualize_evaluation(input_image, output_image, annotations, serialized_dete
     print("{0} missed detections".format(len(missed_detections)))
     print("{0} misclassified detections".format(len(misclassified_detections)))
 
+    #cloned_image = image_np.copy()
+    #vis_util.visualize_boxes_and_labels_on_image_array(cloned_image, np.asarray(detection_boxes, dtype=np.float32),
+    #                                                   detection_classes, detection_scores, category_index,
+    #                                                   instance_masks=None,
+    #                                                   use_normalized_coordinates=False,
+    #                                                   line_thickness=7, skip_labels=True, skip_scores=True)
+    #Image.fromarray(cloned_image).save("all.jpg")
+
     # Visualization of the results of a detection.
     line_thickness = 5
     cloned_image = image_np.copy()
@@ -134,13 +143,13 @@ def visualize_evaluation(input_image, output_image, annotations, serialized_dete
                                                        None, None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False,
                                                        line_thickness=line_thickness,
-                                                       groundtruth_box_visualization_color=(255, 106, 0))
+                                                       groundtruth_box_visualization_color=(255, 35, 0))
     vis_util.visualize_boxes_and_labels_on_image_array(cloned_image,
                                                        np.asarray(misclassified_detections, dtype=np.float32),
                                                        None, None, category_index, instance_masks=None,
                                                        use_normalized_coordinates=False,
                                                        line_thickness=line_thickness,
-                                                       groundtruth_box_visualization_color=(255, 185, 0))
+                                                       groundtruth_box_visualization_color=(255, 200, 0))
     Image.fromarray(cloned_image).save(output_image)
 
 
@@ -155,6 +164,13 @@ if __name__ == "__main__":
     visualize_evaluation(input_image, output_image, annotations, serialized_detections, path_to_labels,
                          number_of_classes)
 
+    exit(0)
 
-    annotations = glob("db/*.txt")
-    input_images = glob("db/*.JPG")
+    annotations = glob("../db/*.txt")
+    input_images = glob("../db/*.JPG")
+    pickle_files = glob("../db/*.pickle")
+
+    for input_image, annotation, pickle_file in tqdm(zip(input_images, annotations, pickle_files),
+                                                     desc="Analyzing images", total=len(annotations)):
+        output_image = input_image.replace(".JPG", "_detection_analysis.jpg")
+        visualize_evaluation(input_image, output_image, annotation, pickle_file, path_to_labels, number_of_classes)
