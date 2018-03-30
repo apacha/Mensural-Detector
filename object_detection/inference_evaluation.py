@@ -145,11 +145,11 @@ def visualize_evaluation(input_image, output_image, annotations, serialized_dete
 
 
 if __name__ == "__main__":
-    input_image = "object_detection/samples/12673.JPG"  # args.input_image
-    output_image = "object_detection/samples/12673_detection_analysis.jpg"  # args.output_image
-    annotations = "object_detection/samples/12673.JPG.txt"
-    serialized_detections = "object_detection/samples/output_dict.pickle"
-    path_to_labels = "object_detection/mapping.txt"
+    input_image = "samples/12673.JPG"  # args.input_image
+    output_image = "samples/12673_detection_analysis.jpg"  # args.output_image
+    annotations = "samples/12673.JPG.txt"
+    serialized_detections = "samples/12673_detection.pickle"
+    path_to_labels = "mapping.txt"
     number_of_classes = 32
 
     visualize_evaluation(input_image, output_image, annotations, serialized_detections, path_to_labels,
