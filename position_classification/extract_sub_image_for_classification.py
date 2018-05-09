@@ -69,7 +69,7 @@ if __name__ == "__main__":
                         action='store_true',
                         help="Whether to add padding to force the symbol to be in the center of the cropped images."
                              "This is useful when the symbol is close to image boundaries.")
-    parser.add_argument("--width", default=160, type=int, help="Width of the extracted sub-image")
+    parser.add_argument("--width", default=224, type=int, help="Width of the extracted sub-image")
     parser.add_argument("--height", default=448, type=int, help="Height of the extracted sub-image")
     args = parser.parse_args()
 
