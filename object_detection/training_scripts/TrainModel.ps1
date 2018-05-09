@@ -12,7 +12,8 @@ $env:PYTHONPATH = "$($pathToGitRoot);$($pathToSourceRoot);$($pathToGitRoot)/slim
 ################################################################
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals"
-$configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale"
+# $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale"
+$configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_cross_validation"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale_0.001_lr"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale_0.01_lr"
 # $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_scale_0.003_lr_20000_decay"
@@ -37,5 +38,5 @@ $configuration = "faster_rcnn_inception_resnet_v2_atrous_600_proposals_small_sca
 
 Start-Transcript -path "$($pathToTranscript)/TrainModel-$($configuration).txt" -append
 echo "Training with $($configuration) configuration"
-python train.py --logtostderr --pipeline_config_path="$($pathToSourceRoot)/configurations/$($configuration).config" --train_dir="$($pathToSourceRoot)/data/checkpoints-$($configuration)-train"
+python train.py --logtostderr --pipeline_config_path="$($pathToSourceRoot)/configurations/$($configuration).config" --train_dir="$($pathToSourceRoot)/data/checkpoints-$($configuration)-5-train"
 Stop-Transcript
