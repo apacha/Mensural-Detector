@@ -6,3 +6,4 @@ imblearn
 sklearn
 seaborn
 keras>=2.1.3
+keras-tqdm
