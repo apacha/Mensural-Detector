@@ -6,14 +6,29 @@ from time import time
 import keras
 import numpy
 import numpy as np
+from IPython import get_ipython
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
 from keras.preprocessing.image import ImageDataGenerator, DirectoryIterator
+from keras_tqdm import TQDMCallback, TQDMNotebookCallback
+
 from position_classification.reporting import sklearn_reporting
 from position_classification.reporting.TrainingHistoryPlotter import TrainingHistoryPlotter
 
 from position_classification.ClassWeightCalculator import ClassWeightCalculator
 from position_classification.models.ConfigurationFactory import ConfigurationFactory
-import tensorflow as tf
+
+
+def running_inside_jupyter_notebook():
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            return True  # Jupyter notebook or qtconsole
+        elif shell == 'TerminalInteractiveShell':
+            return False  # Terminal running IPython
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False  # Probably standard Python interpreter
 
 
 def train_model(dataset_directory: str, model_name: str,
@@ -88,7 +103,11 @@ def train_model(dataset_directory: str, model_name: str,
         log_dir=log_directory,
         batch_size=training_configuration.training_minibatch_size)
 
-    callbacks = [model_checkpoint, early_stop, tensorboard_callback, learning_rate_reduction]
+    if running_inside_jupyter_notebook():
+        callbacks = [model_checkpoint, early_stop, tensorboard_callback, learning_rate_reduction,
+                     TQDMNotebookCallback()]
+    else:
+        callbacks = [model_checkpoint, early_stop, tensorboard_callback, learning_rate_reduction, TQDMCallback()]
 
     class_weight_calculator = ClassWeightCalculator()
     balancing_method = "skBalance"
@@ -107,7 +126,8 @@ def train_model(dataset_directory: str, model_name: str,
         callbacks=callbacks,
         validation_data=validation_data_generator,
         validation_steps=validation_steps_per_epoch,
-        class_weight=class_weights
+        class_weight=class_weights,
+        verbose=0
     )
 
     print("Loading best model from check-point and testing...")
