@@ -123,9 +123,11 @@ if __name__ == "__main__":
                         help='Path to the label map, which maps each category name to a unique number.'
                              'Must be a simple text-file with one mapping per line in the form of:'
                              '"<number> <label>", e.g. "1 L1".')
-    parser.add_argument('--output_image', type=str, default=None,
+    parser.add_argument('--ignorable_classes_list', type=str, required=False,
+                        help='Path to the list of classes, that should be ignored. One class per line')
+    parser.add_argument('--output_image', type=str, required=True,
                         help='Path to the output image, with highlighted boxes.')
-    parser.add_argument('--output_result', type=str, default=None,
+    parser.add_argument('--output_result', type=str, required=True,
                         help='Path to the output file, that will contain a list of detection, '
                              'including position-classification')
     args = parser.parse_args()
@@ -133,6 +135,10 @@ if __name__ == "__main__":
     # Build category map
     detection_category_mapping = build_map(args.detection_label_map)
     classification_category_mapping = build_map(args.classification_label_map)
+    ignorable_classes = []
+    if args.ignorable_classes_list is not None:
+        with open(args.ignorable_classes_list, "r") as ignorable_classes_list:
+            all_lines = ignorable_classes_list.readlines()
 
     # Read frozen graphs
     detection_graph = load_detection_graph(args.detection_inference_graph)
@@ -152,6 +158,7 @@ if __name__ == "__main__":
 
     # Actual detection;
     output_dict = run_inference_for_single_image(image_np, detection_graph)
+    output_lines = []
 
     for idx in range(output_dict['num_detections']):
         if output_dict['detection_scores'][idx] > 0.5:
@@ -172,7 +179,10 @@ if __name__ == "__main__":
                                                                       position_classification_graph,
                                                                       classification_category_mapping)
 
-            print("{0:.3f},{1:.3f},{2:.3f},{3:.3f};{4};{5}".format(x1, y1, x2, y2, category, position_classification))
+            output_line = "{0:.3f},{1:.3f},{2:.3f},{3:.3f};{4};{5}".format(x1, y1, x2, y2, category,
+                                                                         position_classification)
+            print(output_line)
+            output_lines.append(output_line)
 
             if args.output_image is not None:
                 cv2.rectangle(image_cv, (x1, y1), (x2, y2), (255, 0, 0), 3)
@@ -184,3 +194,6 @@ if __name__ == "__main__":
 
     if args.output_image is not None:
         cv2.imwrite(args.output_image, image_cv)
+
+    with open(args.output_result,"w") as output_file:
+        output_file.write("\n".join(output_lines))
