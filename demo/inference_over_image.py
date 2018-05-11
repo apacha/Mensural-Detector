@@ -111,24 +111,25 @@ def predict_position_classification(sub_image: np.ndarray,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Performs detection over input image given a trained detector.')
-    parser.add_argument('--detection_inference_graph', type=str, required=True,
+    parser.add_argument('--detection_inference_graph', type=str, default="2018-03-09_faster_rcnn_mensural_detection.pb",
                         help='Path to the frozen inference graph.')
-    parser.add_argument('--classification_inference_graph', type=str, required=True,
+    parser.add_argument('--classification_inference_graph', type=str,
+                        default="2018-03-26_inception_resnet_v2_position_classification.h5",
                         help='Path to the frozen inference graph.')
-    parser.add_argument('--input_image', type=str, required=True, help='Path to the input image.')
-    parser.add_argument('--detection_label_map', type=str, required=True,
+    parser.add_argument('--input_image', type=str, default="../db/00518.JPG", help='Path to the input image.')
+    parser.add_argument('--detection_label_map', type=str, default="category_mapping.txt",
                         help='Path to the label map, which maps each category name to a unique number.'
                              'Must be a simple text-file with one mapping per line in the form of:'
                              '"<number> <label>", e.g. "1 barline".')
-    parser.add_argument('--classification_label_map', type=str, required=True,
+    parser.add_argument('--classification_label_map', type=str, default="position_mapping.txt",
                         help='Path to the label map, which maps each category name to a unique number.'
                              'Must be a simple text-file with one mapping per line in the form of:'
                              '"<number> <label>", e.g. "1 L1".')
-    parser.add_argument('--ignorable_classes_list', type=str, required=False,
+    parser.add_argument('--ignorable_classes_list', type=str, default="ignorable_classes.txt",
                         help='Path to the list of classes, that should be ignored. One class per line')
-    parser.add_argument('--output_image', type=str, required=True,
+    parser.add_argument('--output_image', type=str, default="annotated_image.jpg",
                         help='Path to the output image, with highlighted boxes.')
-    parser.add_argument('--output_result', type=str, required=True,
+    parser.add_argument('--output_result', type=str, default="output_transcript.txt",
                         help='Path to the output file, that will contain a list of detection, '
                              'including position-classification')
     args = parser.parse_args()
