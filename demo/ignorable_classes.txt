@@ -1,0 +1,12 @@
+barline
+beam
+common_time
+cut_time
+dot
+double_barline
+fermata
+ligature
+proportio_maior
+proportio_minor
+sharp
+undefined
