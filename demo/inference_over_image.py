@@ -94,7 +94,8 @@ def get_sub_image_for_position_classification(image: np.ndarray, x1: int, y1: in
         pad_bottom += 1
 
     padded_sub_image = np.stack(
-        [np.pad(sub_image[:, :, c], [(pad_top, pad_bottom), (pad_left, pad_right)], mode='symmetric') for c in range(3)], axis=2)
+        [np.pad(sub_image[:, :, c], [(pad_top, pad_bottom), (pad_left, pad_right)], mode='symmetric') for c in
+         range(3)], axis=2)
 
     return padded_sub_image
 
@@ -138,7 +139,7 @@ if __name__ == "__main__":
     ignorable_classes = []
     if args.ignorable_classes_list is not None:
         with open(args.ignorable_classes_list, "r") as ignorable_classes_list:
-            all_lines = ignorable_classes_list.readlines()
+            ignorable_classes = ignorable_classes_list.read().splitlines()
 
     # Read frozen graphs
     detection_graph = load_detection_graph(args.detection_inference_graph)
@@ -165,28 +166,33 @@ if __name__ == "__main__":
 
             y1, x1, y2, x2 = output_dict['detection_boxes'][idx]
 
-            y1 = int(y1 * image_cv.shape[0])
-            y2 = int(y2 * image_cv.shape[0])
-            x1 = int(x1 * image_cv.shape[1])
-            x2 = int(x2 * image_cv.shape[1])
-            category = detection_category_mapping[output_dict['detection_classes'][idx]]
+            y1 = int(y1 * image_height)
+            y2 = int(y2 * image_height)
+            x1 = int(x1 * image_width)
+            x2 = int(x2 * image_width)
+            detected_class = detection_category_mapping[output_dict['detection_classes'][idx]]
 
             sub_image = get_sub_image_for_position_classification(image_np, x1, y1, x2, y2,
                                                                   fixed_width_for_position_classification,
                                                                   fixed_height_for_position_classification)
 
-            position_classification = predict_position_classification(sub_image,
-                                                                      position_classification_graph,
-                                                                      classification_category_mapping)
+            if detected_class in ignorable_classes:
+                # TODO: How to handle this case? Is an empty classification acceptable? I think it is better than a fixed (and potentially misleading or incorrect classification, such as S3).
+                position_classification = ""
+            else:
+                position_classification = predict_position_classification(sub_image,
+                                                                          position_classification_graph,
+                                                                          classification_category_mapping)
 
-            output_line = "{0:.3f},{1:.3f},{2:.3f},{3:.3f};{4};{5}".format(x1, y1, x2, y2, category,
-                                                                         position_classification)
+            output_line = "{0:.3f},{1:.3f},{2:.3f},{3:.3f};{4};{5}".format(x1, y1, x2, y2, detected_class,
+                                                                           position_classification)
             print(output_line)
             output_lines.append(output_line)
 
             if args.output_image is not None:
                 cv2.rectangle(image_cv, (x1, y1), (x2, y2), (255, 0, 0), 3)
-                cv2.putText(image_cv, category + "/" + position_classification, (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2,
+                cv2.putText(image_cv, detected_class + "/" + position_classification, (int(x1), int(y1) - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2,
                             cv2.LINE_AA)
 
         else:
@@ -195,5 +201,5 @@ if __name__ == "__main__":
     if args.output_image is not None:
         cv2.imwrite(args.output_image, image_cv)
 
-    with open(args.output_result,"w") as output_file:
+    with open(args.output_result, "w") as output_file:
         output_file.write("\n".join(output_lines))
