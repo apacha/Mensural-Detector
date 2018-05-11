@@ -67,7 +67,7 @@ def build_map(path_to_labelmap):
     return int2category
 
 
-def get_sub_image_for_position_classification(image: np.ndarray, x1: int, y1: int, x2: int, y2: int,
+def get_sub_image_for_position_classification(image: np.ndarray, x1: float, y1: float, x2: float, y2: float,
                                               fixed_width: int, fixed_height: int) -> np.ndarray:
     image_width, image_height = image.shape[1], image.shape[0]
 
@@ -167,10 +167,10 @@ if __name__ == "__main__":
 
             y1, x1, y2, x2 = output_dict['detection_boxes'][idx]
 
-            y1 = int(y1 * image_height)
-            y2 = int(y2 * image_height)
-            x1 = int(x1 * image_width)
-            x2 = int(x2 * image_width)
+            y1 = y1 * image_height
+            y2 = y2 * image_height
+            x1 = x1 * image_width
+            x2 = x2 * image_width
             detected_class = detection_category_mapping[output_dict['detection_classes'][idx]]
 
             sub_image = get_sub_image_for_position_classification(image_np, x1, y1, x2, y2,
@@ -191,7 +191,7 @@ if __name__ == "__main__":
             output_lines.append(output_line)
 
             if args.output_image is not None:
-                cv2.rectangle(image_cv, (x1, y1), (x2, y2), (255, 0, 0), 3)
+                cv2.rectangle(image_cv, (int(x1), int(y1)), (int(x2), int(y2)), (255, 0, 0), 3)
                 cv2.putText(image_cv, detected_class + "/" + position_classification, (int(x1), int(y1) - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2,
                             cv2.LINE_AA)
