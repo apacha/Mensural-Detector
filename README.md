@@ -5,67 +5,36 @@ This is the repository for the fast and reliable Mensural Music Symbol detector 
 The detailed results for various combinations of object-detector, feature-extractor, etc. can be found in [this spreadsheet](https://docs.google.com/spreadsheets/d/1lGHarxpoN_VkhEh_nIgnrR3Wp2-qEQxUfjKVWpUxS50/edit?usp=sharing).
 
 
-# Requirements
+# Preparing the application
+This repository contains several scripts that can be used independently of each other. 
+Before running them, make sure that you have the necessary requirements installed. 
+
+## Install required libraries
 
 - Python 3.6
-- Tensorflow 1.5.0 (or optionally tensorflow-gpu 1.5.0)
+- Tensorflow 1.8.0 (or optionally tensorflow-gpu 1.8.0)
+- pycocotools (more [infos](https://github.com/matterport/Mask_RCNN/issues/6#issuecomment-341503509))
+    - On Linux, run `pip install git+https://github.com/waleedka/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI`
+    - On Windows, run `pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI`
+- Some libraries, as specified in [requirements.txt](MusicObjectDetector/requirements.txt)
 
-For installing Tensorflow, we recommend using [Anaconda](https://www.continuum.io/downloads) or 
-[Miniconda](https://conda.io/miniconda.html) as Python distribution (we did so for preparing Travis-CI and it worked).
+## Build Protobuf files on Linux
 
-To accelerate training even further, you can make use of your GPU, by installing tensorflow-gpu instead of tensorflow
-via pip (note that you can only have one of them) and the required Nvidia drivers. For Windows, we recommend the
-[excellent tutorial by Phil Ferriere](https://github.com/philferriere/dlwin). For Linux, we recommend using the
- official tutorials by [Tensorflow](https://www.tensorflow.org/install/) and [Keras](https://keras.io/#installation).
-
-## Prepare the library
-
-First, make sure you have [protocol buffers](https://developers.google.com/protocol-buffers/docs/downloads) installed, by heading over to [the download page](https://github.com/google/protobuf/releases/), download and install it, so you can run it in the next step.
-
-> For Windows: Notice that version 3.4.0 is required, because [3.5.0 does not work on Windows](https://github.com/google/protobuf/issues/3957).
- 
-Now build the required libraries:
-
-```bash
-# From [GIT_ROOT]
+```commandline
+cd research
 protoc object_detection/protos/*.proto --python_out=.
-cd slim
-python setup.py install
-cd ..
-python setup.py install
 ```
 
-See also https://github.com/tensorflow/models for additional information
+## Build Protobuf files on Windows
 
-## Install pycocotools
+> Run [`DownloadAndBuildProtocolBuffers.ps1`](MusicObjectDetector/DownloadAndBuildProtocolBuffers.ps1) to automate this step or manually build the protobufs by first installing [protocol buffers](https://developers.google.com/protocol-buffers/docs/downloads) and then run:
 
-Taken from [here](https://github.com/matterport/Mask_RCNN/issues/6#issuecomment-341503509):
-
-- On Linux, run `pip install git+https://github.com/waleedka/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI`
-
-- On Windows, run `pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI`
-
-## Append library to python path
-Finally add the [source to the python path](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/installation.md#add-libraries-to-pythonpath).
- 
-For Unix, it should be something like
-
-```bash
-# From tensorflow/models/research/
-export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
+```commandline
+cd research
+protoc object_detection/protos/*.proto --python_out=.
 ```
 
-For Windows (in Powershell):
-
-```powershell
-$pathToGitRoot = "[GIT_ROOT]"
-$pathToSourceRoot = "$($pathToGitRoot)/object_detection"
-$env:PYTHONPATH = "$($pathToGitRoot);$($pathToSourceRoot);$($pathToGitRoot)/slim"
-```
-
-Inside the PyCharm, make sure that the project structure is correctly set up and both `object_detection` and `slim` are marked as source folders. 
-
-![PyCharm Settings](images/PyCharm%20Settings.png)
+Note, that you have to use [version 3.4.0](https://github.com/google/protobuf/releases/download/v3.4.0/) because of a [bug in 3.5.0 and 3.5.1](https://github.com/google/protobuf/issues/3957)
 
 # Prepare the dataset
 For preparing the dataset and transforming it into the right format used for the training, run the following commands, or use the `PrepareDatasetsForTensorflow.ps1` convenience script. 
@@ -81,8 +50,25 @@ python create_tensorflow_record.py --data_dir=..\training_validation_test  	--se
 ```
 
 
-# Training and Evaluation
+# Running the training
 
+## Adding source to Python path
+Make sure you have all required folders appended to the [Python path](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/installation.md#add-libraries-to-pythonpath)
+
+For Linux:
+```bash
+# From tensorflow/models/research/
+export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
+```
+
+For Windows (Powershell):
+```powershell
+$pathToGitRoot = "[GIT_ROOT]"
+$pathToSourceRoot = "$($pathToGitRoot)/object_detection"
+$env:PYTHONPATH = "$($pathToGitRoot);$($pathToSourceRoot);$($pathToGitRoot)/slim"
+```
+
+## Adapting paths
 First make sure, that you have all paths set correctly in the configuration that you wish to run (paths for `fine_tune_checkpoint` and all `input_path` and `label_map_path` fields).
 
 Executing the following command will start the training with the selected configuration 
@@ -142,6 +128,10 @@ The first script will load all annotations and create two csv-files containing t
 # Running inference
 
 Once you have a trained model, you can use the following procedure to detect symbols in a new image:
+
+## Combined detection and classification
+
+There is a ready-to-run standalone demo that uses pre-trained models. Details are described in this demo [README](demo/README.md).
 
 ## Freeze the model
 
