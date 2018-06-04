@@ -1,4 +1,6 @@
 import math
+import os
+import time
 from typing import Dict
 
 import numpy as np
@@ -134,6 +136,9 @@ if __name__ == "__main__":
                              'including position-classification')
     args = parser.parse_args()
 
+    # Uncomment the next line on Windows to run the evaluation on the CPU
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
     # Build category map
     detection_category_mapping = build_map(args.detection_label_map)
     classification_category_mapping = build_map(args.classification_label_map)
@@ -143,8 +148,10 @@ if __name__ == "__main__":
             ignorable_classes = ignorable_classes_list.read().splitlines()
 
     # Read frozen graphs
+    start_time = time.time()
     detection_graph = load_detection_graph(args.detection_inference_graph)
     position_classification_graph = keras.models.load_model(args.classification_inference_graph)
+    start_time_after_loading = time.time()
     fixed_height_for_position_classification = int(position_classification_graph.input.shape[1])
     fixed_width_for_position_classification = int(position_classification_graph.input.shape[2])
 
@@ -204,3 +211,7 @@ if __name__ == "__main__":
 
     with open(args.output_result, "w") as output_file:
         output_file.write("\n".join(output_lines))
+
+    end_time = time.time()
+    print("Full execution time: {0} seconds".format(end_time - start_time))
+    print("Inference time: {0} seconds".format(end_time - start_time_after_loading))
