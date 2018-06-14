@@ -28,10 +28,6 @@ Unzip $output $protoc_folder
 
 cd ..
 .\object_detection\Protoc\bin\protoc.exe object_detection/protos/*.proto --python_out=.
-cd slim
-python setup.py install
-cd ..
-python setup.py install
 
 rm object_detection/Protoc -Recurse
 rm object_detection/protoc-3.4.0-win32.zip
