@@ -1,6 +1,8 @@
 # Mensural Detector
 
 This is the repository for the fast and reliable Mensural Music Symbol detector with Deep Learning, based on the Tensorflow Object Detection API and the [Music Object Detector](https://github.com/apacha/MusicObjectDetector-TF) 
+
+![images](images/12073-detected.png)
  
 The detailed results for various combinations of object-detector, feature-extractor, etc. can be found in [this spreadsheet](https://docs.google.com/spreadsheets/d/1lGHarxpoN_VkhEh_nIgnrR3Wp2-qEQxUfjKVWpUxS50/edit?usp=sharing).
 
