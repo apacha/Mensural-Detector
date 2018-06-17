@@ -118,7 +118,7 @@ if __name__ == "__main__":
     parser.add_argument('--classification_inference_graph', type=str,
                         default="2018-03-26_inception_resnet_v2_position_classification.h5",
                         help='Path to the frozen inference graph.')
-    parser.add_argument('--input_image', type=str, default="../db/00518.JPG", help='Path to the input image.')
+    parser.add_argument('--input_image', type=str, default="12673.JPG", help='Path to the input image.')
     parser.add_argument('--detection_label_map', type=str, default="category_mapping.txt",
                         help='Path to the label map, which maps each category name to a unique number.'
                              'Must be a simple text-file with one mapping per line in the form of:'
