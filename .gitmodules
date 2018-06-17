@@ -1,0 +1,3 @@
+[submodule "db"]
+	path = db
+	url = git@bitbucket.org:apacha/mensural-detector-database
