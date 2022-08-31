@@ -1,8 +1,8 @@
 # Running this demo
 
 Download the trained models from 
-- [2018-03-09_faster_rcnn_mensural_detection.pb](https://owncloud.tuwien.ac.at/index.php/s/SU81Uibv1gRxi0F)
-- [2018-03-26_inception_resnet_v2_position_classification.h5](https://owncloud.tuwien.ac.at/index.php/s/40lYm9qD8wIhwqt)
+- [2018-03-09_faster_rcnn_mensural_detection.pb](https://github.com/apacha/Mensural-Detector/releases/download/v1.0/2018-03-09_faster_rcnn_mensural_detection.pb)
+- [2018-03-26_inception_resnet_v2_position_classification.h5](https://github.com/apacha/Mensural-Detector/releases/download/v1.0/2018-03-26_inception_resnet_v2_position_classification.h5)
 
 and put them into the demo directory.
 
